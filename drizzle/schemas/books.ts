@@ -1,6 +1,6 @@
+import { decimal, integer, text, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { type z } from "zod";
-import { decimal, integer, text, timestamp } from "drizzle-orm/pg-core";
 import { createTable } from "./schema";
 
 export const books = createTable("books", {
