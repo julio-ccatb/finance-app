@@ -99,7 +99,7 @@ export function BorrowersTable({
 
   return (
     <div className="w-full overflow-hidden">
-      <div className="flex items-center gap-4 py-4 sm:flex-row">
+      <div className="flex items-center gap-2 py-4 sm:flex-row">
         <Input
           placeholder="Buscar prestatarios..."
           value={globalFilter ?? ""}
