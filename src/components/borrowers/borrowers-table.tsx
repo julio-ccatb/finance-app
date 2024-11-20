@@ -28,6 +28,7 @@ import {
 } from "@tanstack/react-table";
 import { ArrowUpDown, Filter } from "lucide-react";
 import { useMemo, useState } from "react";
+import { CreateBorrowerForm } from "./create-form";
 
 interface Borrower {
   id: number;
@@ -152,7 +153,7 @@ export function BorrowersTable({
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size={"icon"} className="p-2">
+            <Button variant="outline" size={"icon"} className="p-4">
               <Filter />
             </Button>
           </DropdownMenuTrigger>
@@ -176,6 +177,7 @@ export function BorrowersTable({
               })}
           </DropdownMenuContent>
         </DropdownMenu>
+        <CreateBorrowerForm onCreateBorrower={(data) => console.log(data)} />
       </div>
       <div className="overflow-x-auto rounded-md border">
         <Table>

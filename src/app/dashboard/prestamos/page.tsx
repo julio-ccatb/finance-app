@@ -55,15 +55,13 @@ const Page = () => {
   };
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="px-2">
       <PageHeader
         breadcrumbs={[
           { label: "panel", href: "/dashboard" },
           { label: "Prestamos", href: "/dashboard/prestamos" },
         ]}
-      >
-        <CreateBorrowerForm onCreateBorrower={(data) => console.log(data)} />
-      </PageHeader>
+      ></PageHeader>
 
       <main className="sm:flex-grow">
         <BorrowersTable borrowers={borrowers} onViewLoans={handleViewLoans} />

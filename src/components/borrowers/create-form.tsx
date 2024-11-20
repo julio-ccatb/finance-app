@@ -63,7 +63,11 @@ export function CreateBorrowerForm({
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button size={label ? "default" : "icon"}>
+        <Button
+          className="p-4"
+          variant={"default"}
+          size={label ? "default" : "icon"}
+        >
           <Plus className={label && "mr-2 h-4 w-4"} /> {label}
         </Button>
       </DialogTrigger>
