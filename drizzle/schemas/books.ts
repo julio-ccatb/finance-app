@@ -1,14 +1,8 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { type z } from "zod";
-import {
-  decimal,
-  integer,
-  pgTableCreator,
-  text,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { decimal, integer, text, timestamp } from "drizzle-orm/pg-core";
+import { createTable } from "./schema";
 
-export const createTable = pgTableCreator((name) => `finance-app_${name}`);
 export const books = createTable("books", {
   id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
   name: text("name").notNull().unique(),
