@@ -18,6 +18,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { toast } from "@/hooks/use-toast";
+import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   BorrowersInsertSchema,
@@ -30,7 +32,7 @@ import type * as z from "zod";
 
 interface CreateBorrowerFormProps {
   label?: string;
-  onCreateBorrower: (
+  onCreateBorrower?: (
     borrower: Omit<BorrowersSelectInput, "id" | "createdAt">,
   ) => void;
 }
@@ -40,6 +42,24 @@ export function CreateBorrowerForm({
   onCreateBorrower,
 }: CreateBorrowerFormProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const { mutate: createBorrower } = api.borrower.create.useMutation({
+    onSuccess: () => {
+      toast({
+        title: "¡Nuevo prestatario creado exitosamente!",
+        description: "el prestatario ha sido registrado correctamente.",
+      });
+      setIsDialogOpen(false);
+    },
+    onError: (err) => {
+      toast({
+        variant: "destructive",
+        title: "¡Error al crear el prestatario!",
+        description: `Hubo un problema al registrar el prestatario: ${err.message}`,
+      });
+      setIsDialogOpen(false);
+    },
+  });
 
   const form = useForm<z.infer<typeof BorrowersInsertSchema>>({
     resolver: zodResolver(BorrowersInsertSchema),
@@ -51,12 +71,14 @@ export function CreateBorrowerForm({
   });
 
   function onSubmit(values: z.infer<typeof BorrowersInsertSchema>) {
-    onCreateBorrower({
-      name: values.name,
-      email: values.email ?? null,
-      phone: values.phone ?? null,
-    });
-    setIsDialogOpen(false);
+    if (onCreateBorrower)
+      onCreateBorrower({
+        name: values.name,
+        email: values.email ?? null,
+        phone: values.phone ?? null,
+      });
+    createBorrower(values);
+    // setIsDialogOpen(false);
     form.reset();
   }
 

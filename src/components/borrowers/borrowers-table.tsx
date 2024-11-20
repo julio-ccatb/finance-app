@@ -29,18 +29,13 @@ import {
 import { ArrowUpDown, Filter } from "lucide-react";
 import { useMemo, useState } from "react";
 import { CreateBorrowerForm } from "./create-form";
+import { type BorrowersSelectInput } from "drizzle/schemas/borrowers";
+import { type LoansSelectInput } from "drizzle/schemas/loans";
 
-interface Borrower {
-  id: number;
-  name: string;
-  email: string;
-  totalLoan: number;
-  loanCount: number;
-}
-
+type BorrowerWithLoan = BorrowersSelectInput & { loans: LoansSelectInput[] };
 interface BorrowersTableProps {
-  borrowers: Borrower[];
-  onViewLoans: (borrowerId: number) => void;
+  borrowers: BorrowerWithLoan[];
+  onViewLoans: (borrowerId: string) => void;
 }
 
 export function BorrowersTable({
@@ -50,7 +45,7 @@ export function BorrowersTable({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const columns = useMemo<ColumnDef<Borrower>[]>(
+  const columns = useMemo<ColumnDef<BorrowerWithLoan>[]>(
     () => [
       {
         accessorKey: "name",
@@ -69,7 +64,7 @@ export function BorrowersTable({
           );
         },
         cell: ({ row }) => (
-          <div className="font-medium">{row.getValue("name")}</div>
+          <div className="font-medium">{row.original.name}</div>
         ),
       },
       {
@@ -79,28 +74,7 @@ export function BorrowersTable({
           <div className="max-w-[200px] truncate">{row.getValue("email")}</div>
         ),
       },
-      {
-        accessorKey: "totalLoan",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-              className="whitespace-nowrap"
-            >
-              Total Préstamos
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          );
-        },
-        cell: ({ row }) => (
-          <div className="text-right font-medium">
-            ${row.original.totalLoan.toLocaleString("es-ES")}
-          </div>
-        ),
-      },
+
       {
         accessorKey: "loanCount",
         header: "Número de Préstamos",
@@ -144,6 +118,7 @@ export function BorrowersTable({
 
   return (
     <div className="w-full overflow-hidden">
+      {JSON.stringify(borrowers[0]?.loans)}
       <div className="flex items-center gap-4 py-4 sm:flex-row">
         <Input
           placeholder="Buscar prestatarios..."

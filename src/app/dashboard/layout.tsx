@@ -4,6 +4,7 @@ import { type Metadata } from "next";
 
 import SidebarLayout from "@/components/sidebar/sidebar";
 import { auth } from "@/server/auth";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -26,6 +27,7 @@ export default async function RootLayout({
         }}
       >
         {children}
+        <Toaster />
       </SidebarLayout>
     );
   }
