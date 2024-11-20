@@ -53,7 +53,6 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarProvider,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
