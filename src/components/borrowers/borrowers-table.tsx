@@ -26,11 +26,11 @@ import {
   type ColumnDef,
   type SortingState,
 } from "@tanstack/react-table";
-import { ArrowUpDown, Filter } from "lucide-react";
-import { useMemo, useState } from "react";
-import { CreateBorrowerForm } from "./create-form";
 import { type BorrowersSelectInput } from "drizzle/schemas/borrowers";
 import { type LoansSelectInput } from "drizzle/schemas/loans";
+import { ArrowUpDown, Eye, Filter } from "lucide-react";
+import { useMemo, useState } from "react";
+import { CreateBorrowerForm } from "./create-form";
 
 type BorrowerWithLoan = BorrowersSelectInput & { loans: LoansSelectInput[] };
 interface BorrowersTableProps {
@@ -49,19 +49,8 @@ export function BorrowersTable({
     () => [
       {
         accessorKey: "name",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-              className="whitespace-nowrap"
-            >
-              Nombre
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          );
+        header: ({}) => {
+          return <p>Nombre</p>;
         },
         cell: ({ row }) => (
           <div className="font-medium">{row.original.name}</div>
@@ -70,29 +59,21 @@ export function BorrowersTable({
       {
         accessorKey: "email",
         header: "Email",
-        cell: ({ row }) => (
-          <div className="max-w-[200px] truncate">{row.getValue("email")}</div>
-        ),
+        cell: ({ row }) => <div className="">{row.original.email}</div>,
       },
 
       {
         accessorKey: "loanCount",
-        header: "Número de Préstamos",
-        cell: ({ row }) => (
-          <div className="text-center">{row.getValue("loanCount")}</div>
-        ),
-      },
-      {
-        id: "actions",
+        header: "Préstamos",
         cell: ({ row }) => {
           const borrower = row.original;
           return (
             <Button
-              variant="ghost"
+              variant="outline"
               onClick={() => onViewLoans(borrower.id)}
               className="whitespace-nowrap"
             >
-              Ver Préstamos
+              <Eye /> Ver {borrower.loans.length}
             </Button>
           );
         },
@@ -118,7 +99,6 @@ export function BorrowersTable({
 
   return (
     <div className="w-full overflow-hidden">
-      {JSON.stringify(borrowers[0]?.loans)}
       <div className="flex items-center gap-4 py-4 sm:flex-row">
         <Input
           placeholder="Buscar prestatarios..."
@@ -154,23 +134,34 @@ export function BorrowersTable({
         </DropdownMenu>
         <CreateBorrowerForm onCreateBorrower={(data) => console.log(data)} />
       </div>
-      <div className="overflow-x-auto rounded-md border">
+      <div className="rounded-md">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} className="whitespace-nowrap">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} className={header.id}>
+                    {header.isPlaceholder ? null : (
+                      <div
+                        className={
+                          header.column.getCanSort()
+                            ? "flex cursor-pointer select-none items-center"
+                            : ""
+                        }
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                        {{
+                          asc: <ArrowUpDown className="ml-2 h-4 w-4" />,
+                          desc: <ArrowUpDown className="ml-2 h-4 w-4" />,
+                        }[header.column.getIsSorted() as string] ?? null}
+                      </div>
+                    )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>

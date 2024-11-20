@@ -172,7 +172,7 @@ export default function SidebarLayout({
 
   console.log(user);
   return (
-    <SidebarProvider>
+    <>
       <Sidebar collapsible="icon">
         <SidebarHeader>
           <SidebarMenu>
@@ -428,6 +428,6 @@ export default function SidebarLayout({
       <SidebarInset>
         <div className="w-screen p-4 sm:w-auto">{children}</div>
       </SidebarInset>
-    </SidebarProvider>
+    </>
   );
 }

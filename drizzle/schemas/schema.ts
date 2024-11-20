@@ -130,8 +130,4 @@ export const verificationTokens = createTable(
   }),
 );
 
-export const schema = {
-  borrowers,
-  loans,
-  payments,
-};
+export { borrowers, loans, payments };

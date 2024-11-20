@@ -1,7 +1,10 @@
 "use client";
 import { BorrowersTable } from "@/components/borrowers/borrowers-table";
+import ThemeToggle from "@/components/mode-toggle";
 import { PageHeader } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
 import { api } from "@/trpc/react";
+import { Sun } from "lucide-react";
 import { useState } from "react";
 
 const Page = () => {
@@ -24,10 +27,15 @@ const Page = () => {
           { label: "panel", href: "/dashboard" },
           { label: "Prestamos", href: "/dashboard/prestamos" },
         ]}
-      ></PageHeader>
+      >
+        <ThemeToggle />
+      </PageHeader>
 
       <main className="sm:flex-grow">
-        <BorrowersTable borrowers={borrowers} onViewLoans={handleViewLoans} />
+        <BorrowersTable
+          borrowers={borrowers ?? []}
+          onViewLoans={handleViewLoans}
+        />
 
         {selectedBorrowerId && (
           <div className="mt-8">

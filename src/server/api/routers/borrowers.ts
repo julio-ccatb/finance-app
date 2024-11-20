@@ -21,7 +21,9 @@ export const borrowerRouter = createTRPCRouter({
         .select()
         .from(borrowers)
         .leftJoin(loans, eq(borrowers.id, loans.borrowerId));
-      if (queryResult) console.log(queryResult);
-      return queryResult;
+      const result = queryResult.map((item) => {
+        return { ...item.borrowers, loans: item.loans ? [item.loans] : [] };
+      });
+      return result;
     }),
 });
