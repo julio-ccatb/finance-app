@@ -61,8 +61,10 @@ const Page = () => {
           { label: "panel", href: "/dashboard" },
           { label: "Prestamos", href: "/dashboard/prestamos" },
         ]}
-      ></PageHeader>
-      <CreateBorrowerForm onCreateBorrower={(data) => console.log(data)} />
+      >
+        <CreateBorrowerForm onCreateBorrower={(data) => console.log(data)} />
+      </PageHeader>
+
       <main className="sm:flex-grow">
         <BorrowersTable borrowers={borrowers} onViewLoans={handleViewLoans} />
 

@@ -1,25 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  getSortedRowModel,
-  type SortingState,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  type ColumnDef,
-} from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -28,6 +16,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+  type ColumnDef,
+  type SortingState,
+} from "@tanstack/react-table";
+import { ArrowUpDown, Filter } from "lucide-react";
+import { useMemo, useState } from "react";
 
 interface Borrower {
   id: number;
@@ -143,7 +143,7 @@ export function BorrowersTable({
 
   return (
     <div className="w-full overflow-hidden">
-      <div className="flex flex-col items-center justify-between gap-4 py-4 sm:flex-row">
+      <div className="flex items-center gap-4 py-4 sm:flex-row">
         <Input
           placeholder="Buscar prestatarios..."
           value={globalFilter ?? ""}
@@ -152,8 +152,8 @@ export function BorrowersTable({
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columnas <ChevronDown className="ml-2 h-4 w-4" />
+            <Button variant="outline" size={"icon"} className="p-2">
+              <Filter />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

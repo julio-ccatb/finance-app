@@ -1,9 +1,9 @@
 import { relations } from "drizzle-orm";
 import { date, text, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { createTable } from "drizzle/util";
 import { type z } from "zod";
 import { loans } from "./loans";
-import { createTable } from "drizzle/util";
 
 export const borrowers = createTable("borrowers", {
   id: varchar("id", { length: 255 })
