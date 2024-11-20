@@ -1,6 +1,5 @@
 "use client";
 import { BorrowersTable } from "@/components/borrowers/borrowers-table";
-import { CreateBorrowerForm } from "@/components/borrowers/create-form";
 import { PageHeader } from "@/components/page-header";
 import { useState } from "react";
 

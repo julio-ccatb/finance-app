@@ -10,6 +10,7 @@ import {
   DollarSign,
   Folder,
   Forward,
+  HandCoins,
   Home,
   LogOut,
   MoreHorizontal,
@@ -22,14 +23,6 @@ import {
 } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import {
   Collapsible,
   CollapsibleContent,
@@ -45,7 +38,6 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
 import {
   Sidebar,
   SidebarContent,
@@ -63,11 +55,9 @@ import {
   SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import { type ReactNode, useState } from "react";
-import { PageHeader } from "../page-header";
 // This is sample data.
 
 const data = {
@@ -94,6 +84,11 @@ const data = {
       title: "Ingresos",
       url: "/ingresos",
       icon: DollarSign,
+    },
+    {
+      title: "Prestamos",
+      url: "/dashboard/prestamos",
+      icon: HandCoins,
     },
     {
       title: "Presupuesto",
@@ -246,7 +241,7 @@ export default function SidebarLayout({
                 if (!item.items) {
                   return (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild>
+                      <SidebarMenuButton tooltip={item.title} asChild>
                         <a href={item.url}>
                           <item.icon />
                           <span>{item.title}</span>
