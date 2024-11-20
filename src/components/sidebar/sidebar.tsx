@@ -187,7 +187,7 @@ export default function SidebarLayout({
                     size="lg"
                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                   >
-                    <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                       {activeTeam && <activeTeam.logo className="size-4" />}
                     </div>
                     <div className="grid flex-1 text-left text-sm leading-tight">
@@ -207,7 +207,7 @@ export default function SidebarLayout({
                   side="bottom"
                   sideOffset={4}
                 >
-                  <DropdownMenuLabel className="text-muted-foreground text-xs">
+                  <DropdownMenuLabel className="text-xs text-muted-foreground">
                     Teams
                   </DropdownMenuLabel>
                   {data.teams.map((team, index) => (
@@ -225,10 +225,10 @@ export default function SidebarLayout({
                   ))}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="gap-2 p-2">
-                    <div className="bg-background flex size-6 items-center justify-center rounded-md border">
+                    <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                       <Plus className="size-4" />
                     </div>
-                    <div className="text-muted-foreground font-medium">
+                    <div className="font-medium text-muted-foreground">
                       Add team
                     </div>
                   </DropdownMenuItem>
@@ -430,25 +430,6 @@ export default function SidebarLayout({
         <SidebarRail />
       </Sidebar>
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-        </header>
         <div className="p-4">{children}</div>
       </SidebarInset>
     </SidebarProvider>

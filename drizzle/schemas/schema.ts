@@ -2,13 +2,16 @@ import { relations, sql } from "drizzle-orm";
 import {
   index,
   integer,
-  pgTableCreator,
   primaryKey,
   text,
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+import { createTable } from "drizzle/util";
 import { type AdapterAccount } from "next-auth/adapters";
+import { borrowers } from "./borrowers";
+import { loans } from "./loans";
+import { payments } from "./payments";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -16,7 +19,6 @@ import { type AdapterAccount } from "next-auth/adapters";
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = pgTableCreator((name) => `finance-app_${name}`);
 
 export const posts = createTable(
   "post",
@@ -127,3 +129,9 @@ export const verificationTokens = createTable(
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
   }),
 );
+
+export const schema = {
+  borrowers,
+  loans,
+  payments,
+};

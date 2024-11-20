@@ -1,7 +1,7 @@
 import { decimal, integer, text, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { createTable } from "drizzle/util";
 import { type z } from "zod";
-import { createTable } from "./schema";
 
 export const books = createTable("books", {
   id: integer("id").primaryKey().generatedByDefaultAsIdentity(),

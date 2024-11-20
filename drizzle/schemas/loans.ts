@@ -4,7 +4,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { type z } from "zod";
 import { borrowers } from "./borrowers";
 import { payments } from "./payments";
-import { createTable } from "./schema";
+import { createTable } from "drizzle/util";
 
 export const loans = createTable("loans", {
   id: varchar("id", { length: 255 })
