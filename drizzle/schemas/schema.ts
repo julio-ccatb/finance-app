@@ -12,6 +12,7 @@ import { type AdapterAccount } from "next-auth/adapters";
 import { borrowers } from "./borrowers";
 import { loans } from "./loans";
 import { payments } from "./payments";
+import { roles } from "./roles";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -52,6 +53,7 @@ export const users = createTable("user", {
     mode: "date",
     withTimezone: true,
   }).default(sql`CURRENT_TIMESTAMP`),
+  roles: roles("roles").default("NOT_VERIFIED"),
   image: varchar("image", { length: 255 }),
 });
 
