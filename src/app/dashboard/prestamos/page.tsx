@@ -27,10 +27,7 @@ const Page = () => {
       ></PageHeader>
 
       <main className="sm:flex-grow">
-        <BorrowersTable
-          borrowers={borrowers ?? []}
-          onViewLoans={handleViewLoans}
-        />
+        <BorrowersTable borrowers={borrowers} onViewLoans={handleViewLoans} />
 
         {selectedBorrowerId && (
           <div className="mt-8">
