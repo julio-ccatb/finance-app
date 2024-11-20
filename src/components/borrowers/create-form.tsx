@@ -29,12 +29,14 @@ import { useForm } from "react-hook-form";
 import type * as z from "zod";
 
 interface CreateBorrowerFormProps {
+  label?: string;
   onCreateBorrower: (
     borrower: Omit<BorrowersSelectInput, "id" | "createdAt">,
   ) => void;
 }
 
 export function CreateBorrowerForm({
+  label,
   onCreateBorrower,
 }: CreateBorrowerFormProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -61,8 +63,8 @@ export function CreateBorrowerForm({
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" /> Agregar Prestatario
+        <Button size={label ? "default" : "icon"}>
+          <Plus className={label && "mr-2 h-4 w-4"} /> {label}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[400px]">

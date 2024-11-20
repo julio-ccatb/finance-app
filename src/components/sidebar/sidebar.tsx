@@ -67,6 +67,7 @@ import {
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import { type ReactNode, useState } from "react";
+import { PageHeader } from "../page-header";
 // This is sample data.
 
 const data = {
@@ -430,7 +431,7 @@ export default function SidebarLayout({
         <SidebarRail />
       </Sidebar>
       <SidebarInset>
-        <div className="p-4">{children}</div>
+        <div className="w-screen p-4 sm:w-auto">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

@@ -55,7 +55,7 @@ const Page = () => {
   };
 
   return (
-    <div>
+    <div className="overflow-x-hidden">
       <PageHeader
         breadcrumbs={[
           { label: "panel", href: "/dashboard" },
@@ -63,7 +63,7 @@ const Page = () => {
         ]}
       ></PageHeader>
       <CreateBorrowerForm onCreateBorrower={(data) => console.log(data)} />
-      <main className="p-4 sm:flex-grow">
+      <main className="sm:flex-grow">
         <BorrowersTable borrowers={borrowers} onViewLoans={handleViewLoans} />
 
         {selectedBorrowerId && (
