@@ -38,19 +38,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LoansInsertSchema } from "drizzle/schemas/loans";
+import {
+  type LoansCreateInput,
+  LoansInsertSchema,
+} from "drizzle/schemas/loans";
 import { loanStatusArray } from "drizzle/schemas/loan-status";
-
-type LoansCreateInput = {
-  borrowerId: string;
-  amount: string;
-  startDate: string;
-  dueDate: string;
-  id?: string | undefined;
-  createdAt?: string | null | undefined;
-  interestRate?: string | null | undefined;
-  status?: string | undefined;
-};
 
 const formSchema = LoansInsertSchema;
 
