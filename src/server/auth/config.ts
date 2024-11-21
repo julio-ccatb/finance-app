@@ -77,7 +77,6 @@ export const authConfig = {
           roles: dbUser[0]?.roles,
         },
       };
-      console.log(updated);
       return updated;
     },
   },
