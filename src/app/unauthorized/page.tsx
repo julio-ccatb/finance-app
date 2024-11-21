@@ -1,6 +1,5 @@
 "use client";
 
-import { ROUTES } from "@/app/_utils/routes";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { ROUTES } from "../_components/utils/routes";
 
 export default function Component() {
   const router = useRouter();
