@@ -57,6 +57,8 @@ import {
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import { type ReactNode, useState } from "react";
+import { signOut } from "next-auth/react";
+import { ROUTES } from "@/app/_components/utils/routes";
 // This is sample data.
 
 const data = {
@@ -413,7 +415,9 @@ export default function SidebarLayout({
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => signOut({ callbackUrl: ROUTES.LOGIN })}
+                  >
                     <LogOut />
                     Log out
                   </DropdownMenuItem>
