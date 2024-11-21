@@ -1,5 +1,5 @@
 {
-  "id": "67dc596b-095e-4436-93d0-e303874cef81",
+  "id": "ea659fe7-7e3e-4113-a027-b5ac6fe12b94",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -206,10 +206,11 @@
         },
         "status": {
           "name": "status",
-          "type": "text",
+          "type": "finance-app_loan_statuses",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
-          "default": "'pending'"
+          "default": "'ACTIVE'"
         },
         "created_at": {
           "name": "created_at",
@@ -592,6 +593,14 @@
           "notNull": false,
           "default": "CURRENT_TIMESTAMP"
         },
+        "roles": {
+          "name": "roles",
+          "type": "finance-app_roles",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'NOT_VERIFIED'"
+        },
         "image": {
           "name": "image",
           "type": "varchar(255)",
@@ -641,7 +650,32 @@
       "uniqueConstraints": {}
     }
   },
-  "enums": {},
+  "enums": {
+    "public.finance-app_loan_statuses": {
+      "name": "finance-app_loan_statuses",
+      "schema": "public",
+      "values": [
+        "APPROVED",
+        "DISBURSED",
+        "ACTIVE",
+        "COMPLETED",
+        "DEFAULTED",
+        "CANCELED"
+      ]
+    },
+    "public.finance-app_roles": {
+      "name": "finance-app_roles",
+      "schema": "public",
+      "values": [
+        "NOT_VERIFIED",
+        "ADMIN",
+        "EDITOR",
+        "OPERATOR",
+        "READER",
+        "VIEWER"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "_meta": {

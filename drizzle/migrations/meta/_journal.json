@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1732107658626,
-      "tag": "0000_next_shocker",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1732141128817,
-      "tag": "0001_chubby_tyger_tiger",
+      "when": 1732200704955,
+      "tag": "0000_amused_microchip",
       "breakpoints": true
     }
   ]

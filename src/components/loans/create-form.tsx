@@ -39,6 +39,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LoansInsertSchema } from "drizzle/schemas/loans";
+import { loanStatusArray } from "drizzle/schemas/loan-status";
 
 type LoansCreateInput = {
   borrowerId: string;
@@ -262,9 +263,11 @@ export function CreateLoanModal({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="ACTIVE">Activo</SelectItem>
-                      <SelectItem value="PAID">Pagado</SelectItem>
-                      <SelectItem value="DEFAULTED">En mora</SelectItem>
+                      {loanStatusArray.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {status}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormDescription className="text-xs sm:text-sm">

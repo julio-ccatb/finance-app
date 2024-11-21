@@ -6,6 +6,7 @@ import { type z } from "zod";
 import { borrowers } from "./borrowers";
 import { payments } from "./payments";
 import { decimalStringValidator } from "@/lib/zod/utils";
+import { loanStatuses } from "./loan-status";
 
 export const loans = createTable("loans", {
   id: varchar("id", { length: 255 })
@@ -21,7 +22,7 @@ export const loans = createTable("loans", {
   ), // Annual interest rate (%)
   startDate: date("start_date").notNull(), // Start date of the loan
   dueDate: date("due_date").notNull(), // When the loan must be repaid
-  status: text("status").default("pending"), // Loan status (e.g., pending, completed)
+  status: loanStatuses("status").default("ACTIVE"), // Loan status (e.g., pending, completed)
   createdAt: date("created_at").defaultNow(), // When the loan was issued
 });
 
