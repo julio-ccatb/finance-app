@@ -11,11 +11,18 @@ const Page = () => {
   );
 
   const { data: borrowers } = api.borrower.list.useQuery();
+  const { mutate: createLoan, data: createdLoan } =
+    api.loans.create.useMutation();
 
   const handleViewLoans = (borrowerId: string) => {
     setSelectedBorrowerId(borrowerId);
     // Here you would typically fetch the loans for this borrower
     console.log(`Fetching loans for borrower with ID: ${borrowerId}`);
+  };
+  const handleCreateLoan = (borrowerId: string) => {
+    setSelectedBorrowerId(borrowerId);
+    // Here you would typically fetch the loans for this borrower
+    // createLoan(borrowerId);
   };
 
   return (
@@ -33,6 +40,8 @@ const Page = () => {
         <BorrowersTable
           borrowers={borrowers ?? []}
           onViewLoans={handleViewLoans}
+          onCreateLoan={handleCreateLoan}
+          onMoreActions={() => null}
         />
 
         {selectedBorrowerId && (

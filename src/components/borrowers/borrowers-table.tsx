@@ -28,7 +28,13 @@ import {
 } from "@tanstack/react-table";
 import { type BorrowersSelectInput } from "drizzle/schemas/borrowers";
 import { type LoansSelectInput } from "drizzle/schemas/loans";
-import { ArrowUpDown, Eye, Filter } from "lucide-react";
+import {
+  ArrowUpDown,
+  CirclePlus,
+  Eye,
+  Filter,
+  MoreHorizontal,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { CreateBorrowerForm } from "./create-form";
 
@@ -36,11 +42,15 @@ type BorrowerWithLoan = BorrowersSelectInput & { loans: LoansSelectInput[] };
 interface BorrowersTableProps {
   borrowers: BorrowerWithLoan[];
   onViewLoans: (borrowerId: string) => void;
+  onCreateLoan: (borrowerId: string) => void;
+  onMoreActions: (borrowerId: string) => void;
 }
 
 export function BorrowersTable({
   borrowers,
   onViewLoans,
+  onCreateLoan,
+  onMoreActions,
 }: BorrowersTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
@@ -68,18 +78,37 @@ export function BorrowersTable({
         cell: ({ row }) => {
           const borrower = row.original;
           return (
-            <Button
-              variant="outline"
-              onClick={() => onViewLoans(borrower.id)}
-              className="whitespace-nowrap"
-            >
-              <Eye /> Ver {borrower.loans.length}
-            </Button>
+            <div className="flex space-x-2">
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => onViewLoans(borrower.id)}
+                title={`Ver ${borrower.loans.length} préstamos`}
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => onCreateLoan(borrower.id)}
+                title="Crear préstamo"
+              >
+                <CirclePlus className="h-4 w-4" />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => onMoreActions(borrower.id)}
+                title="Más acciones"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </div>
           );
         },
       },
     ],
-    [onViewLoans],
+    [onCreateLoan, onMoreActions, onViewLoans],
   );
 
   const table = useReactTable({

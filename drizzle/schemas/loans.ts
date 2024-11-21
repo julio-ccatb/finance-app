@@ -5,6 +5,7 @@ import { createTable } from "drizzle/util";
 import { type z } from "zod";
 import { borrowers } from "./borrowers";
 import { payments } from "./payments";
+import { decimalStringValidator } from "@/lib/zod/utils";
 
 export const loans = createTable("loans", {
   id: varchar("id", { length: 255 })
@@ -32,7 +33,9 @@ export const loansRelations = relations(loans, ({ one, many }) => ({
   payments: many(payments),
 }));
 
-export const LoansInsertSchema = createInsertSchema(loans);
+export const LoansInsertSchema = createInsertSchema(loans, {
+  amount: decimalStringValidator,
+});
 export const LoansSelectSchema = createSelectSchema(loans);
 
 export type LoansCreateInput = z.infer<typeof LoansInsertSchema>;
