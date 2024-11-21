@@ -35,6 +35,7 @@ export const loansRelations = relations(loans, ({ one, many }) => ({
 
 export const LoansInsertSchema = createInsertSchema(loans, {
   amount: decimalStringValidator,
+  interestRate: decimalStringValidator,
 });
 export const LoansSelectSchema = createSelectSchema(loans);
 
