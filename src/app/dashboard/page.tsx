@@ -40,12 +40,12 @@ export const description = "A collection of health charts.";
 
 export default function Charts() {
   return (
-    <div className="ml-1">
+    <div className="px-2">
       <PageHeader breadcrumbs={[{ label: "panel", href: "/dashboard" }]}>
         <ThemeToggle />
       </PageHeader>
 
-      <div className="chart-wrapper flex flex-col justify-center gap-6 pr-4 sm:flex-row sm:p-8">
+      <div className="lg:p flex flex-col justify-center gap-6 pr-4 pt-4 sm:flex-row sm:p-8">
         <div className="grid w-full gap-6 sm:grid-cols-2 lg:max-w-[22rem] lg:grid-cols-1 xl:max-w-[25rem]">
           <Card className="lg:max-w-md" x-chunk="charts-01-chunk-0">
             <CardHeader className="space-y-0 pb-2">

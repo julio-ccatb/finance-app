@@ -50,7 +50,7 @@ export function PageHeader({
                   }
                 >
                   {item.href ? (
-                    <BreadcrumbLink href={item.href}>
+                    <BreadcrumbLink className="capitalize" href={item.href}>
                       {item.label}
                     </BreadcrumbLink>
                   ) : (
