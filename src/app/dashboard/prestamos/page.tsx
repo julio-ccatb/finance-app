@@ -1,23 +1,28 @@
 "use client";
 import { BorrowersTable } from "@/components/borrowers/borrowers-table";
 import { CreateLoanModal } from "@/components/loans/create-form";
+import { BorrowerLoansModal } from "@/components/loans/list-modal";
 import ThemeToggle from "@/components/mode-toggle";
 import { PageHeader } from "@/components/page-header";
 import { api } from "@/trpc/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Page = () => {
   const [selectedBorrowerId, setSelectedBorrowerId] = useState<string | null>(
     null,
   );
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoansModalOpen, setIsLoansModalOpen] = useState(false);
 
-  const { data: borrowers } = api.borrower.list.useQuery();
+  const { data: borrowers, refetch } = api.borrower.list.useQuery();
   const { mutate: createLoan, data: createdLoan } =
     api.loans.create.useMutation();
 
+  useEffect(() => void refetch(), [isOpen, isLoansModalOpen, refetch]);
+
   const handleViewLoans = (borrowerId: string) => {
     setSelectedBorrowerId(borrowerId);
+    setIsLoansModalOpen(true);
     // Here you would typically fetch the loans for this borrower
     console.log(`Fetching loans for borrower with ID: ${borrowerId}`);
   };
@@ -26,6 +31,11 @@ const Page = () => {
     setIsOpen(true);
     // Here you would typically fetch the loans for this borrower
     // createLoan(borrowerId);
+  };
+  const handleGeneratePayment = async (loanId: string) => {
+    // Implement the logic to generate a payment for the given loan
+    console.log(`Generating payment for loan: ${loanId}`);
+    // You might want to update the loan status or refresh the loans list after this
   };
 
   return (
@@ -47,23 +57,30 @@ const Page = () => {
           onMoreActions={() => null}
         />
 
-        {selectedBorrowerId && (
-          <div className="mt-8">
+        {selectedBorrowerId && borrowers && (
+          <>
             <CreateLoanModal
               onClose={() => setIsOpen(false)}
               isOpen={isOpen}
               borrowerId={selectedBorrowerId}
               onCreateLoan={(data) => createLoan(data)}
             />
-            <h2 className="mb-4 text-xl font-semibold">
-              Préstamos de{" "}
-              {borrowers?.find((b) => b.id === selectedBorrowerId)?.name}
-            </h2>
-            {/* Here you would render the loans for the selected borrower */}
-            <p className="text-gray-600">
-              Tabla de préstamos se implementará aquí usando TanStack Table.
-            </p>
-          </div>
+            <BorrowerLoansModal
+              isOpen={isLoansModalOpen}
+              onClose={() => setIsLoansModalOpen(false)}
+              borrower={
+                borrowers.find(
+                  (borrower) => borrower.id === selectedBorrowerId,
+                )!
+              }
+              loans={
+                borrowers.find(
+                  (borrower) => borrower.id === selectedBorrowerId,
+                )!.loans
+              }
+              onGeneratePayment={handleGeneratePayment}
+            />
+          </>
         )}
       </main>
     </div>
