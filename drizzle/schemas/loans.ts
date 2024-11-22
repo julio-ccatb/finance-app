@@ -22,7 +22,7 @@ export const loans = createTable("loans", {
   ), // Annual interest rate (%)
   startDate: date("start_date").notNull(), // Start date of the loan
   dueDate: date("due_date").notNull(), // When the loan must be repaid
-  status: loanStatuses("status").default("ACTIVE"), // Loan status (e.g., pending, completed)
+  status: loanStatuses("status").notNull().default("ACTIVE"), // Loan status (e.g., pending, completed)
   createdAt: date("created_at").defaultNow(), // When the loan was issued
 });
 

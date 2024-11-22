@@ -3,9 +3,10 @@ import { eq } from "drizzle-orm";
 import {
   borrowers,
   BorrowersInsertSchema,
+  type BorrowersSelectInput,
   BorrowersSelectSchema,
 } from "drizzle/schemas/borrowers";
-import { loans } from "drizzle/schemas/loans";
+import { loans, type LoansSelectInput } from "drizzle/schemas/loans";
 import { groupBy } from "lodash";
 
 export const borrowerRouter = createTRPCRouter({
@@ -38,7 +39,7 @@ export const borrowerRouter = createTRPCRouter({
         return {
           ...borrower,
           loans,
-        };
+        } as BorrowersSelectInput & { loans: LoansSelectInput[] };
       });
 
       return result;

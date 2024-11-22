@@ -1,0 +1,1 @@
+ALTER TABLE "finance-app_loans" ALTER COLUMN "status" SET NOT NULL;
