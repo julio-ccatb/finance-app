@@ -3,6 +3,7 @@ export enum ROUTES {
   LOGIN = "/login",
   LOGOUT = "/logout",
   HOME = "/dashboard",
+  LOANS = "/dashboard/prestamos",
   CUSTOMERS = "/dashboard/customers",
   ORDER = "/dashboard/order",
   ORDER_ID = "/dashboard/order/",

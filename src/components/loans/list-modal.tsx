@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ExternalLink, CreditCard } from "lucide-react";
 import { type LoansSelectInput } from "drizzle/schemas/loans";
+import { ROUTES } from "@/app/_components/utils/routes";
 
 type BorrowerLoansModalProps = {
   isOpen: boolean;
@@ -162,7 +163,9 @@ export function BorrowerLoansModal({
                       variant="outline"
                       size="sm"
                       className="h-8 flex-1 px-1 py-1 text-xs sm:h-10 sm:w-full sm:px-2 sm:text-sm"
-                      onClick={() => window.open(`/loans/${loan.id}`, "_blank")}
+                      onClick={() =>
+                        window.open(`${ROUTES.LOANS}/${loan.id}`, "_blank")
+                      }
                     >
                       <ExternalLink className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
                       <span>Ver Detalles</span>
