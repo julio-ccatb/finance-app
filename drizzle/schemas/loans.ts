@@ -18,7 +18,7 @@ export const loans = createTable("loans", {
     .references(() => borrowers.id), // Foreign key linking to the borrower
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(), // Total loan amount
   interestRate: numeric("interest_rate", { precision: 5, scale: 2 }).default(
-    "120.00",
+    "10.00",
   ), // Annual interest rate (%)
   startDate: date("start_date").notNull(), // Start date of the loan
   dueDate: date("due_date").notNull(), // When the loan must be repaid

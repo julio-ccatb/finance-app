@@ -29,6 +29,7 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type * as z from "zod";
+import { PhoneInput } from "../phone-input/phone-input";
 
 interface CreateBorrowerFormProps {
   label?: string;
@@ -123,7 +124,7 @@ export function CreateBorrowerForm({
                 <FormItem>
                   <FormLabel>Correo Electrónico</FormLabel>
                   <FormControl>
-                    <Input type="email" {...field} />
+                    <Input type="email" {...field} value={field.value ?? ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -136,7 +137,13 @@ export function CreateBorrowerForm({
                 <FormItem>
                   <FormLabel>Teléfono</FormLabel>
                   <FormControl>
-                    <Input type="tel" {...field} />
+                    <PhoneInput
+                      defaultCountry="DO"
+                      onChange={(value) =>
+                        form.setValue("phone", value, { shouldValidate: true })
+                      }
+                    />
+                    {/* <Input type="tel" {...field} /> */}
                   </FormControl>
                   <FormMessage />
                 </FormItem>
