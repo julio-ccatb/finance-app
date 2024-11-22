@@ -15,8 +15,7 @@ const Page = () => {
   const [isLoansModalOpen, setIsLoansModalOpen] = useState(false);
 
   const { data: borrowers, refetch } = api.borrower.list.useQuery();
-  const { mutate: createLoan, data: createdLoan } =
-    api.loans.create.useMutation();
+  const { mutate: createLoan } = api.loans.create.useMutation();
 
   useEffect(() => void refetch(), [isOpen, isLoansModalOpen, refetch]);
 

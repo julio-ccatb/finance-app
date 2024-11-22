@@ -84,84 +84,94 @@ export function BorrowerLoansModal({
             Préstamos de {borrower.name}
           </DialogTitle>
         </DialogHeader>
-        <ScrollArea className="mt-2 max-h-[calc(90vh-120px)]">
-          <div className="space-y-4 pr-4">
-            {loans.map((loan) => (
-              <Card
-                key={loan.id}
-                className="flex flex-col sm:flex-row sm:items-stretch"
-              >
-                <div className="flex-grow">
-                  <CardHeader className="pb-2 sm:pb-4 sm:pt-4">
-                    <CardTitle className="flex items-center justify-between text-base sm:text-lg">
-                      <span className="text-sm font-semibold sm:text-base">
-                        ${loan.amount.toLocaleString()}
-                      </span>
-                      <Badge
-                        className={`${getStatusColor(loan.status)} px-2 py-1 text-xs text-white`}
-                      >
-                        {getStatusText(loan.status)}
-                      </Badge>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="py-2 sm:py-4">
-                    <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-3 sm:text-sm">
-                      <div>
-                        <strong className="block">Inicio:</strong>
-                        <span>
-                          {format(new Date(loan.startDate), "PP", {
-                            locale: es,
-                          })}
+        <ScrollArea className="mt-2 max-h-[calc(90vh-120px)] px-1 sm:px-2">
+          {loans.length === 0 ? (
+            <div className="py-8 text-center">
+              <p className="text-lg text-gray-500">
+                No hay préstamos registrados para este prestatario.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {loans.map((loan) => (
+                <Card
+                  key={loan.id}
+                  className="flex flex-col overflow-hidden sm:flex-row sm:items-stretch"
+                >
+                  <div className="flex-grow">
+                    <CardHeader className="pb-2 sm:pb-4 sm:pt-4">
+                      <CardTitle className="flex items-center justify-between text-base sm:text-lg">
+                        <span className="text-sm font-semibold sm:text-base">
+                          ${loan.amount.toLocaleString()}
                         </span>
-                      </div>
-                      <div>
-                        <strong className="block">Vencimiento:</strong>
-                        <span>
-                          {format(new Date(loan.dueDate), "PP", { locale: es })}
-                        </span>
-                      </div>
-                      {loan.interestRate !== null && (
+                        <Badge
+                          className={`${getStatusColor(loan.status)} px-2 py-1 text-xs text-white`}
+                        >
+                          {getStatusText(loan.status)}
+                        </Badge>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="py-2 sm:py-4">
+                      <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-3 sm:text-sm">
                         <div>
-                          <strong className="block">Tasa de interés:</strong>
-                          <span>{loan.interestRate}%</span>
+                          <strong className="block">Inicio:</strong>
+                          <span>
+                            {format(new Date(loan.startDate), "PP", {
+                              locale: es,
+                            })}
+                          </span>
                         </div>
+                        <div>
+                          <strong className="block">Vencimiento:</strong>
+                          <span>
+                            {format(new Date(loan.dueDate), "PP", {
+                              locale: es,
+                            })}
+                          </span>
+                        </div>
+                        {loan.interestRate !== null && (
+                          <div>
+                            <strong className="block">Tasa de interés:</strong>
+                            <span>{loan.interestRate}%</span>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </div>
+                  <CardFooter className="flex flex-row justify-between gap-2 px-2 pt-2 sm:w-44 sm:flex-col sm:justify-center sm:p-4 sm:px-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 flex-1 px-1 py-1 text-xs sm:h-10 sm:w-full sm:px-2 sm:text-sm"
+                      onClick={() => handleGeneratePayment(loan.id)}
+                      disabled={
+                        isGeneratingPayment === loan.id ||
+                        loan.status === "COMPLETED"
+                      }
+                    >
+                      {isGeneratingPayment === loan.id ? (
+                        "Generando..."
+                      ) : (
+                        <>
+                          <CreditCard className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                          <span>Generar Pago</span>
+                        </>
                       )}
-                    </div>
-                  </CardContent>
-                </div>
-                <CardFooter className="flex flex-row justify-between gap-2 pt-2 sm:w-44 sm:flex-col sm:justify-center sm:p-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 flex-1 px-2 py-1 text-xs sm:h-10 sm:w-full sm:text-sm"
-                    onClick={() => handleGeneratePayment(loan.id)}
-                    disabled={
-                      isGeneratingPayment === loan.id ||
-                      loan.status === "COMPLETED"
-                    }
-                  >
-                    {isGeneratingPayment === loan.id ? (
-                      "Generando..."
-                    ) : (
-                      <>
-                        <CreditCard className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-                        <span>Generar Pago</span>
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 flex-1 px-2 py-1 text-xs sm:h-10 sm:w-full sm:text-sm"
-                    onClick={() => window.open(`/loans/${loan.id}`, "_blank")}
-                  >
-                    <ExternalLink className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-                    <span>Ver Detalles</span>
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 flex-1 px-1 py-1 text-xs sm:h-10 sm:w-full sm:px-2 sm:text-sm"
+                      onClick={() => window.open(`/loans/${loan.id}`, "_blank")}
+                    >
+                      <ExternalLink className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                      <span>Ver Detalles</span>
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          )}
         </ScrollArea>
       </DialogContent>
     </Dialog>
