@@ -7,3 +7,11 @@ export const paymentStatuses = pgEnum("payment_statuses", [
 ]);
 
 export type PaymentStatus = (typeof paymentStatuses.enumValues)[number];
+
+export const paymentType = pgEnum("payment_statuses", [
+  "PAYMENT",
+  "INTREST",
+  "SURCHARGE",
+]);
+
+export type PaymentType = (typeof paymentStatuses.enumValues)[number];

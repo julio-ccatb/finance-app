@@ -22,6 +22,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ExternalLink, CreditCard } from "lucide-react";
 import { type LoansSelectInput } from "drizzle/schemas/loans";
 import { ROUTES } from "@/app/_components/utils/routes";
+import { useRouter } from "next/navigation";
 
 type BorrowerLoansModalProps = {
   isOpen: boolean;
@@ -45,6 +46,8 @@ export function BorrowerLoansModal({
     null,
   );
 
+  const router = useRouter();
+
   const handleGeneratePayment = async (loanId: string) => {
     setIsGeneratingPayment(loanId);
     onGeneratePayment(loanId);
@@ -54,13 +57,13 @@ export function BorrowerLoansModal({
   const getStatusColor = (status: LoansSelectInput["status"]) => {
     switch (status) {
       case "ACTIVE":
-        return "bg-green-500";
+        return "!bg-green-500";
       case "COMPLETED":
-        return "bg-blue-500";
+        return "!bg-blue-500";
       case "DEFAULTED":
-        return "bg-red-500";
+        return "!bg-red-500";
       default:
-        return "bg-gray-500";
+        return "!bg-gray-500";
     }
   };
 
@@ -163,9 +166,7 @@ export function BorrowerLoansModal({
                       variant="outline"
                       size="sm"
                       className="h-8 flex-1 px-1 py-1 text-xs sm:h-10 sm:w-full sm:px-2 sm:text-sm"
-                      onClick={() =>
-                        window.open(`${ROUTES.LOANS}/${loan.id}`, "_blank")
-                      }
+                      onClick={() => router.push(`${ROUTES.LOANS}/${loan.id}`)}
                     >
                       <ExternalLink className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
                       <span>Ver Detalles</span>

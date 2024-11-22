@@ -29,6 +29,13 @@
       "when": 1732288983826,
       "tag": "0003_mute_miracleman",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1732297572671,
+      "tag": "0004_stale_zaran",
+      "breakpoints": true
     }
   ]
 }
