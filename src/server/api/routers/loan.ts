@@ -1,14 +1,15 @@
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
+import Decimal from "decimal.js";
 import { eq } from "drizzle-orm";
 import {
   loans,
   LoansInsertSchema,
   LoansSelectSchema,
 } from "drizzle/schemas/loans";
-import { payments } from "drizzle/schemas/payments";
+import { PaymentTypeArray } from "drizzle/schemas/payment-status";
+import { payments, PaymentsCreateInput } from "drizzle/schemas/payments";
 import { z } from "zod";
-import Decimal from "decimal.js";
 
 export const loansRouter = createTRPCRouter({
   create: protectedProcedure
@@ -41,13 +42,15 @@ export const loansRouter = createTRPCRouter({
     }),
 
   generatePayment: protectedProcedure
-    .input(z.string())
+    .input(
+      z.object({ loanId: z.string(), transaction: z.enum(PaymentTypeArray) }),
+    )
     .mutation(async ({ ctx, input }) => {
       const [loan] = await ctx.db
         .select()
         .from(loans)
         // .innerJoin(payments, eq(loans.id, payments.loanId))
-        .where(eq(loans.id, input)); // Use the input (id) to filter the record
+        .where(eq(loans.id, input.loanId)); // Use the input (id) to filter the record
       if (!loan)
         throw new TRPCError({
           code: "NOT_FOUND",
@@ -60,14 +63,22 @@ export const loansRouter = createTRPCRouter({
         .where(eq(payments.loanId, loan.id));
       const amount = new Decimal(loan.amount);
       const interest = new Decimal(loan.interestRate!).div(100);
-      const payment = interest.mul(amount);
-      // .div(100);
+      const paymentAmount = interest.mul(amount);
+
       console.log({
         ...loan,
         payments: paymentsList,
         amount,
         interest,
-        payment,
+        paymentAmount,
       });
+
+      const data = {
+        loanId: input.loanId,
+        paymentType: input.transaction,
+        amount: paymentAmount.toString(),
+      } as PaymentsCreateInput;
+
+      await ctx.db.insert(payments).values(data);
     }),
 });

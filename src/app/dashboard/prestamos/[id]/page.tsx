@@ -57,15 +57,14 @@ export default function LoanDetailPage() {
   const [newPaymentAmount, setNewPaymentAmount] = useState("");
   const [newSurchargeAmount, setNewSurchargeAmount] = useState("");
 
-  const handleGeneratePayment = async (
+  const handleGeneratePayment = (
     type: "PAYMENT" | "INTREST" | "SURCHARGE",
     amount?: string,
   ) => {
-    setIsGeneratingPayment(true);
     try {
-      //   generatePayment({ loanId, type, amount });
-      setNewPaymentAmount("");
-      setNewSurchargeAmount("");
+      if (type === "INTREST") generatePayment({ loanId, transaction: type });
+      //   setNewPaymentAmount("");
+      //   setNewSurchargeAmount("");
     } catch (error) {
       console.error("Error generating payment:", error);
       // Handle error (e.g., show error message to user)
