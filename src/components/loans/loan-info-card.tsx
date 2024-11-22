@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { LoanPaymentChart } from "./loan-payment-chart";
 import { type LoansSelectInput } from "drizzle/schemas/loans";
 
 interface LoanInfoCardProps {
@@ -83,6 +84,12 @@ export function LoanInfoCard({ loan }: LoanInfoCardProps) {
               <p>{loan.interestRate}%</p>
             </div>
           )}
+        </div>
+        <div className="mt-6">
+          <LoanPaymentChart
+            loanAmount={loan.amount}
+            balancePaid={loan.balance}
+          />
         </div>
       </CardContent>
     </Card>

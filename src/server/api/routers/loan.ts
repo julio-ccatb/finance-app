@@ -8,7 +8,7 @@ import {
   LoansSelectSchema,
 } from "drizzle/schemas/loans";
 import { PaymentTypeArray } from "drizzle/schemas/payment-status";
-import { payments, PaymentsCreateInput } from "drizzle/schemas/payments";
+import { payments, type PaymentsCreateInput } from "drizzle/schemas/payments";
 import { z } from "zod";
 
 export const loansRouter = createTRPCRouter({
@@ -43,35 +43,84 @@ export const loansRouter = createTRPCRouter({
 
   generatePayment: protectedProcedure
     .input(
-      z.object({ loanId: z.string(), transaction: z.enum(PaymentTypeArray) }),
+      z.object({
+        loanId: z.string(),
+        transaction: z.enum(PaymentTypeArray),
+        amount: z.string().optional(),
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const [loan] = await ctx.db
         .select()
         .from(loans)
-        // .innerJoin(payments, eq(loans.id, payments.loanId))
         .where(eq(loans.id, input.loanId)); // Use the input (id) to filter the record
-      if (!loan)
+
+      if (!loan) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Préstamo no encontrado",
         });
+      }
 
-      const paymentsList = await ctx.db
-        .select()
-        .from(payments)
-        .where(eq(payments.loanId, loan.id));
-      const amount = new Decimal(loan.amount);
-      const interest = new Decimal(loan.interestRate!).div(100);
-      const paymentAmount = interest.mul(amount);
+      // Convert loan data to Decimal for accurate calculations
+      const loanAmount = new Decimal(loan.amount);
+      const loanBalance = new Decimal(loan.balance); // Total paid so far
+      let paymentAmount: Decimal;
 
-      console.log({
-        ...loan,
-        payments: paymentsList,
-        amount,
-        interest,
-        paymentAmount,
-      });
+      // Use switch-case to determine the payment amount
+      switch (input.transaction) {
+        case "PAYMENT": {
+          if (!input.amount) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message:
+                "El monto es requerido para el tipo de transacción 'PAYMENT'",
+            });
+          }
+          const inputAmount = new Decimal(input.amount);
+          paymentAmount = inputAmount;
+
+          // Update balance (add payment to balance)
+          const newBalance = loanBalance.plus(paymentAmount);
+          await ctx.db
+            .update(loans)
+            .set({ balance: newBalance.toString() })
+            .where(eq(loans.id, input.loanId));
+          break;
+        }
+        case "INTREST": {
+          // Interest is calculated on the remaining loan amount
+          const remainingAmount = loanAmount.minus(loanBalance);
+          const interest = new Decimal(loan.interestRate!).div(100);
+          paymentAmount = interest.mul(remainingAmount);
+          break;
+        }
+        case "SURCHARGE": {
+          if (!input.amount) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message:
+                "El monto es requerido para el tipo de transacción 'SURCHARGE'",
+            });
+          }
+          const inputAmount = new Decimal(input.amount);
+          paymentAmount = inputAmount;
+
+          // Update balance (add surcharge to balance)
+          const newBalance = loanBalance.plus(paymentAmount);
+          await ctx.db
+            .update(loans)
+            .set({ balance: newBalance.toString() })
+            .where(eq(loans.id, input.loanId));
+          break;
+        }
+        default: {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Tipo de transacción no válido",
+          });
+        }
+      }
 
       const data = {
         loanId: input.loanId,

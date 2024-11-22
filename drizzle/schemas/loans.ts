@@ -17,6 +17,9 @@ export const loans = createTable("loans", {
     .notNull()
     .references(() => borrowers.id), // Foreign key linking to the borrower
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(), // Total loan amount
+  balance: numeric("balance", { precision: 10, scale: 2 })
+    .notNull()
+    .default("0.00"), // Amount paid by the borrower
   interestRate: numeric("interest_rate", { precision: 5, scale: 2 }).default(
     "10.00",
   ), // Annual interest rate (%)
@@ -36,6 +39,7 @@ export const loansRelations = relations(loans, ({ one, many }) => ({
 
 export const LoansInsertSchema = createInsertSchema(loans, {
   amount: decimalStringValidator,
+  balance: decimalStringValidator,
   interestRate: decimalStringValidator,
 });
 export const LoansSelectSchema = createSelectSchema(loans);

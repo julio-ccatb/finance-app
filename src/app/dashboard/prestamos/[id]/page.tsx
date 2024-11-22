@@ -13,7 +13,6 @@ import { type LoansSelectInput } from "drizzle/schemas/loans";
 import { type PaymentsSelectInput } from "drizzle/schemas/payments";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
-import { useState } from "react";
 
 export default function LoanDetailPage() {
   const params = useParams();
@@ -24,25 +23,25 @@ export default function LoanDetailPage() {
     isLoading,
     refetch,
   } = api.loans.findById.useQuery(loanId);
-  const { mutate: generatePayment } = api.loans.generatePayment.useMutation({
-    onSuccess: () => refetch(),
-  });
-
-  const [isGeneratingPayment, setIsGeneratingPayment] = useState(false);
+  const { mutate: generatePayment, isPending: isGeneratingPayment } =
+    api.loans.generatePayment.useMutation({
+      onSuccess: () => refetch(),
+    });
 
   const handleGeneratePayment = (
     type: "PAYMENT" | "INTREST" | "SURCHARGE",
     amount?: string,
   ) => {
     try {
-      setIsGeneratingPayment(true);
       if (type === "INTREST") generatePayment({ loanId, transaction: type });
+      if (type === "PAYMENT")
+        generatePayment({ loanId, transaction: type, amount });
+      if (type === "SURCHARGE")
+        generatePayment({ loanId, transaction: type, amount });
       // Handle other types of payments here
     } catch (error) {
       console.error("Error generating payment:", error);
       // Handle error (e.g., show error message to user)
-    } finally {
-      setIsGeneratingPayment(false);
     }
   };
 

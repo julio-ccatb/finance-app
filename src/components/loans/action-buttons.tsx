@@ -10,21 +10,44 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertTriangle, DollarSign, Percent } from 'lucide-react';
-import { useState } from "react";
+import { AlertTriangle, DollarSign, Percent } from "lucide-react";
+import { useState, useRef } from "react";
 
 interface ActionButtonsProps {
-  onGeneratePayment: (type: "PAYMENT" | "INTREST" | "SURCHARGE", amount?: string) => void;
+  onGeneratePayment: (
+    type: "PAYMENT" | "INTREST" | "SURCHARGE",
+    amount?: string,
+  ) => void;
   isGeneratingPayment: boolean;
 }
 
-export function ActionButtons({ onGeneratePayment, isGeneratingPayment }: ActionButtonsProps) {
+export function ActionButtons({
+  onGeneratePayment,
+  isGeneratingPayment,
+}: ActionButtonsProps) {
   const [newPaymentAmount, setNewPaymentAmount] = useState("");
   const [newSurchargeAmount, setNewSurchargeAmount] = useState("");
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [interestDialogOpen, setInterestDialogOpen] = useState(false);
+  const [surchargeDialogOpen, setSurchargeDialogOpen] = useState(false);
+
+  const paymentDialogRef = useRef<HTMLDivElement>(null);
+  const interestDialogRef = useRef<HTMLDivElement>(null);
+  const surchargeDialogRef = useRef<HTMLDivElement>(null);
+
+  const handleGeneratePayment = (
+    type: "PAYMENT" | "INTREST" | "SURCHARGE",
+    amount?: string,
+  ) => {
+    onGeneratePayment(type, amount);
+    if (type === "PAYMENT") setPaymentDialogOpen(false);
+    if (type === "INTREST") setInterestDialogOpen(false);
+    if (type === "SURCHARGE") setSurchargeDialogOpen(false);
+  };
 
   return (
     <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <Dialog>
+      <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
         <DialogTrigger asChild>
           <Button className="w-full">
             <DollarSign className="mr-2 h-4 w-4" /> Agregar Pago
@@ -33,7 +56,9 @@ export function ActionButtons({ onGeneratePayment, isGeneratingPayment }: Action
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Agregar Nuevo Pago</DialogTitle>
-            <DialogDescription>Ingrese el monto del pago a realizar.</DialogDescription>
+            <DialogDescription>
+              Ingrese el monto del pago a realizar.
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
@@ -51,7 +76,7 @@ export function ActionButtons({ onGeneratePayment, isGeneratingPayment }: Action
           </div>
           <DialogFooter>
             <Button
-              onClick={() => onGeneratePayment("PAYMENT", newPaymentAmount)}
+              onClick={() => handleGeneratePayment("PAYMENT", newPaymentAmount)}
               disabled={isGeneratingPayment}
             >
               {isGeneratingPayment ? "Generando..." : "Generar Pago"}
@@ -60,7 +85,7 @@ export function ActionButtons({ onGeneratePayment, isGeneratingPayment }: Action
         </DialogContent>
       </Dialog>
 
-      <Dialog>
+      <Dialog open={interestDialogOpen} onOpenChange={setInterestDialogOpen}>
         <DialogTrigger asChild>
           <Button variant="secondary" className="w-full">
             <Percent className="mr-2 h-4 w-4" /> Generar Interés
@@ -74,14 +99,17 @@ export function ActionButtons({ onGeneratePayment, isGeneratingPayment }: Action
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={() => onGeneratePayment("INTREST")} disabled={isGeneratingPayment}>
+            <Button
+              onClick={() => handleGeneratePayment("INTREST")}
+              disabled={isGeneratingPayment}
+            >
               {isGeneratingPayment ? "Generando..." : "Confirmar"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <Dialog>
+      <Dialog open={surchargeDialogOpen} onOpenChange={setSurchargeDialogOpen}>
         <DialogTrigger asChild>
           <Button variant="outline" className="w-full">
             <AlertTriangle className="mr-2 h-4 w-4" /> Agregar Recargo
@@ -90,7 +118,9 @@ export function ActionButtons({ onGeneratePayment, isGeneratingPayment }: Action
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Agregar Recargo</DialogTitle>
-            <DialogDescription>Ingrese el monto del recargo a aplicar.</DialogDescription>
+            <DialogDescription>
+              Ingrese el monto del recargo a aplicar.
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
@@ -108,7 +138,9 @@ export function ActionButtons({ onGeneratePayment, isGeneratingPayment }: Action
           </div>
           <DialogFooter>
             <Button
-              onClick={() => onGeneratePayment("SURCHARGE", newSurchargeAmount)}
+              onClick={() =>
+                handleGeneratePayment("SURCHARGE", newSurchargeAmount)
+              }
               disabled={isGeneratingPayment}
             >
               {isGeneratingPayment ? "Generando..." : "Aplicar Recargo"}
@@ -119,4 +151,3 @@ export function ActionButtons({ onGeneratePayment, isGeneratingPayment }: Action
     </div>
   );
 }
-
