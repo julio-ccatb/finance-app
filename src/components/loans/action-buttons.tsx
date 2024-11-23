@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertTriangle, DollarSign, Percent } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState } from "react";
 
 interface ActionButtonsProps {
   onGeneratePayment: (
@@ -30,10 +30,6 @@ export function ActionButtons({
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [interestDialogOpen, setInterestDialogOpen] = useState(false);
   const [surchargeDialogOpen, setSurchargeDialogOpen] = useState(false);
-
-  const paymentDialogRef = useRef<HTMLDivElement>(null);
-  const interestDialogRef = useRef<HTMLDivElement>(null);
-  const surchargeDialogRef = useRef<HTMLDivElement>(null);
 
   const handleGeneratePayment = (
     type: "PAYMENT" | "INTREST" | "SURCHARGE",
