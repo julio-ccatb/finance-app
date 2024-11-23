@@ -27,6 +27,18 @@ import {
 } from "@/components/ui/table";
 import { DatePicker } from "@/components/ui/date-picker";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   type ColumnDef,
   type ColumnFilter,
   flexRender,
@@ -39,6 +51,7 @@ import {
 import { format, subYears, addYears } from "date-fns";
 import { es } from "date-fns/locale";
 import { type PaymentsSelectInput } from "drizzle/schemas/payments";
+import { CalendarIcon, FilterIcon, XCircleIcon, X } from "lucide-react";
 
 interface PaymentHistoryTableProps {
   payments: PaymentsSelectInput[];
@@ -71,6 +84,12 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
     }
   };
 
+  const getFilterBadgeLabel = (columnId: string, value: string) => {
+    if (columnId === "status") return getStatusText(value);
+    if (columnId === "paymentType") return getPaymentTypeText(value);
+    return value;
+  };
+
   const columns: ColumnDef<PaymentsSelectInput>[] = [
     {
       accessorKey: "paymentDate",
@@ -82,7 +101,11 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
             : "N/A"}
         </span>
       ),
-      filterFn: (row, columnId, filterValue: { start: Date; end: Date }) => {
+      filterFn: (
+        row,
+        columnId,
+        filterValue: { start: Date | undefined; end: Date | undefined },
+      ) => {
         if (!filterValue.start || !filterValue.end) return true;
         const paymentDate = new Date(row.getValue(columnId));
         return (
@@ -168,6 +191,8 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
     }
   }, [startDate, endDate, table]);
 
+  const isFiltered = table.getState().columnFilters.length > 0;
+
   return (
     <Card className="mt-8">
       <CardHeader>
@@ -177,60 +202,129 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="mb-4 flex flex-col gap-4 sm:flex-row">
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <DatePicker
-              date={startDate}
-              setDate={setStartDate}
-              placeholder="Fecha inicial"
-            />
-            <DatePicker
-              date={endDate}
-              setDate={setEndDate}
-              placeholder="Fecha final"
-            />
+        <div className="mb-4 space-y-4">
+          <div className="flex items-center gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-[280px]">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {startDate && endDate ? (
+                    <>
+                      {format(startDate, "P", { locale: es })} -{" "}
+                      {format(endDate, "P", { locale: es })}
+                    </>
+                  ) : (
+                    <span>Seleccionar fechas</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-fit p-0" align="start">
+                <div className="flex flex-col gap-2 p-3">
+                  <DatePicker
+                    date={startDate}
+                    setDate={setStartDate}
+                    placeholder="Fecha inicial"
+                  />
+                  <DatePicker
+                    date={endDate}
+                    setDate={setEndDate}
+                    placeholder="Fecha final"
+                  />
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size={"icon"}>
+                  <FilterIcon />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Filtros</DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col gap-4 py-4">
+                  <Select
+                    value={
+                      (table.getColumn("status")?.getFilterValue() as string) ??
+                      ""
+                    }
+                    onValueChange={(value) =>
+                      table
+                        .getColumn("status")
+                        ?.setFilterValue(value === "ALL" ? undefined : value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ALL">Todos</SelectItem>
+                      <SelectItem value="COMPLETED">Completado</SelectItem>
+                      <SelectItem value="PENDING">Pendiente</SelectItem>
+                      <SelectItem value="EXPIRED">Expirado</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select
+                    value={
+                      (table
+                        .getColumn("paymentType")
+                        ?.getFilterValue() as string) ?? ""
+                    }
+                    onValueChange={(value) =>
+                      table
+                        .getColumn("paymentType")
+                        ?.setFilterValue(value === "ALL" ? undefined : value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ALL">Todos</SelectItem>
+                      <SelectItem value="PAYMENT">Pago</SelectItem>
+                      <SelectItem value="INTREST">Interés</SelectItem>
+                      <SelectItem value="SURCHARGE">Recargo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
-          <Select
-            value={
-              (table.getColumn("status")?.getFilterValue() as string) ?? ""
-            }
-            onValueChange={(value) =>
-              table
-                .getColumn("status")
-                ?.setFilterValue(value === "ALL" ? undefined : value)
-            }
-          >
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Filtrar por estado" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">Todos</SelectItem>
-              <SelectItem value="COMPLETED">Completado</SelectItem>
-              <SelectItem value="PENDING">Pendiente</SelectItem>
-              <SelectItem value="EXPIRED">Expirado</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select
-            value={
-              (table.getColumn("paymentType")?.getFilterValue() as string) ?? ""
-            }
-            onValueChange={(value) =>
-              table
-                .getColumn("paymentType")
-                ?.setFilterValue(value === "ALL" ? undefined : value)
-            }
-          >
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Filtrar por tipo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">Todos</SelectItem>
-              <SelectItem value="PAYMENT">Pago</SelectItem>
-              <SelectItem value="INTREST">Interés</SelectItem>
-              <SelectItem value="SURCHARGE">Recargo</SelectItem>
-            </SelectContent>
-          </Select>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {table.getState().columnFilters.map((filter) => {
+              if (filter.id !== "paymentDate") {
+                return (
+                  <Badge key={filter.id} variant="secondary" className="gap-1">
+                    {getFilterBadgeLabel(filter.id, filter.value as string)}
+                    <X
+                      className="h-3 w-3 cursor-pointer"
+                      onClick={() =>
+                        table.getColumn(filter.id)?.setFilterValue(undefined)
+                      }
+                    />
+                  </Badge>
+                );
+              }
+              return null;
+            })}
+            {columnFilters.length > 1 && (
+              <Button
+                variant="ghost"
+                onClick={() => table.resetColumnFilters()}
+                size={"icon"}
+              >
+                {/* Assuming FilterX is defined elsewhere */}
+                {/* <FilterX /> */}
+                <XCircleIcon className="mr-2 h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
+
         <div className="rounded-md border">
           <Table>
             <TableHeader>
@@ -279,8 +373,8 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
             </TableBody>
           </Table>
         </div>
-        <div className="flex items-center justify-between py-4">
-          <div className="flex-1 text-sm text-muted-foreground">
+        <div className="flex flex-col items-center justify-between gap-4 py-4 sm:flex-row">
+          <div className="text-sm text-muted-foreground">
             Mostrando{" "}
             {table.getState().pagination.pageIndex *
               table.getState().pagination.pageSize +
@@ -293,7 +387,7 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
             )}{" "}
             de {table.getFilteredRowModel().rows.length} resultados
           </div>
-          <div className="space-x-2">
+          <div className="flex items-center space-x-2">
             <Button
               variant="outline"
               size="sm"
