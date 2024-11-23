@@ -71,9 +71,11 @@ export default function LoanDetailPage() {
               onGeneratePayment={handleGeneratePayment}
               isGeneratingPayment={isGeneratingPayment}
             />
-            <PaymentHistoryTable
-              payments={(loan.payments as PaymentsSelectInput[]) || []}
-            />
+            {
+              <PaymentHistoryTable
+                payments={loan.payments as PaymentsSelectInput[]}
+              />
+            }
           </>
         ) : (
           <div className="flex h-[calc(100vh-64px)] items-center justify-center">

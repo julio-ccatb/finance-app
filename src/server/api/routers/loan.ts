@@ -34,11 +34,16 @@ export const loansRouter = createTRPCRouter({
         .from(loans)
         .leftJoin(payments, eq(loans.id, payments.loanId))
         .where(eq(loans.id, input)); // Use the input (id) to filter the record
+
       const formatedLoan = {
         ...loan[0]?.loans,
-        payments: loan.map((item) => item.payments),
+        payments: loan.map((item) => item.payments).filter(Boolean), // Keep only truthy (non-null) payment objects
       };
-      return formatedLoan;
+
+      return {
+        ...formatedLoan,
+        payments: formatedLoan.payments.length ? formatedLoan.payments : [], // Ensure payments is an empty array if none exist
+      };
     }),
 
   generatePayment: protectedProcedure
@@ -105,13 +110,6 @@ export const loansRouter = createTRPCRouter({
           }
           const inputAmount = new Decimal(input.amount);
           paymentAmount = inputAmount;
-
-          // Update balance (add surcharge to balance)
-          const newBalance = loanBalance.plus(paymentAmount);
-          await ctx.db
-            .update(loans)
-            .set({ balance: newBalance.toString() })
-            .where(eq(loans.id, input.loanId));
           break;
         }
         default: {
