@@ -1,5 +1,5 @@
 {
-  "id": "ea659fe7-7e3e-4113-a027-b5ac6fe12b94",
+  "id": "8395d9bf-e03e-4f24-ae46-60d9e1b9cccb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -185,12 +185,19 @@
           "primaryKey": false,
           "notNull": true
         },
+        "balance": {
+          "name": "balance",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0.00'"
+        },
         "interest_rate": {
           "name": "interest_rate",
           "type": "numeric(5, 2)",
           "primaryKey": false,
           "notNull": false,
-          "default": "'120.00'"
+          "default": "'10.00'"
         },
         "start_date": {
           "name": "start_date",
@@ -209,7 +216,7 @@
           "type": "finance-app_loan_statuses",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "'ACTIVE'"
         },
         "created_at": {
@@ -260,6 +267,22 @@
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "payment_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'PENDING'"
+        },
+        "payment_type": {
+          "name": "payment_type",
+          "type": "payment_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'INTREST'"
         },
         "payment_date": {
           "name": "payment_date",
@@ -661,6 +684,24 @@
         "COMPLETED",
         "DEFAULTED",
         "CANCELED"
+      ]
+    },
+    "public.payment_status": {
+      "name": "payment_status",
+      "schema": "public",
+      "values": [
+        "PENDING",
+        "COMPLETED",
+        "EXPIRED"
+      ]
+    },
+    "public.payment_type": {
+      "name": "payment_type",
+      "schema": "public",
+      "values": [
+        "PAYMENT",
+        "INTREST",
+        "SURCHARGE"
       ]
     },
     "public.finance-app_roles": {

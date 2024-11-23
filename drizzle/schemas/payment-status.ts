@@ -1,6 +1,6 @@
 import { pgEnum } from "drizzle-orm/pg-core";
 
-export const paymentStatuses = pgEnum("payment_statuses", [
+export const paymentStatuses = pgEnum("payment_status", [
   "PENDING", // Payment is awaiting processing
   "COMPLETED", // Payment has been successfully completed
   "EXPIRED", // Payment has expired due to timeout or inactivity
@@ -9,7 +9,7 @@ export const paymentStatuses = pgEnum("payment_statuses", [
 export type PaymentStatus = (typeof paymentStatuses.enumValues)[number];
 export const PaymentStatusArray = paymentStatuses.enumValues;
 
-export const paymentType = pgEnum("payment_statuses", [
+export const paymentType = pgEnum("payment_type", [
   "PAYMENT",
   "INTREST",
   "SURCHARGE",

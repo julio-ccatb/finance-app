@@ -43,55 +43,58 @@ export function LoanInfoCard({ loan }: LoanInfoCardProps) {
   };
 
   return (
-    <Card className="mt-8">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">
-          Información del Préstamo
-        </CardTitle>
-        <CardDescription>Detalles y estado actual del préstamo</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div>
-            <p className="text-sm font-medium text-gray-500">
-              Monto del Préstamo
-            </p>
-            <p className="text-lg font-semibold">
-              ${loan.amount.toLocaleString()}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Estado</p>
-            <Badge className={`${getStatusColor(loan.status)} text-white`}>
-              {getStatusText(loan.status)}
-            </Badge>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Fecha de Inicio</p>
-            <p>{format(new Date(loan.startDate), "PP", { locale: es })}</p>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">
-              Fecha de Vencimiento
-            </p>
-            <p>{format(new Date(loan.dueDate), "PP", { locale: es })}</p>
-          </div>
-          {loan.interestRate && (
+    <div className="flex flex-col justify-between gap-4 sm:flex-row">
+      <Card className="mt-8 sm:w-8/12">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">
+            Información del Préstamo
+          </CardTitle>
+          <CardDescription>
+            Detalles y estado actual del préstamo
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <p className="text-sm font-medium text-gray-500">
-                Tasa de Interés
+                Monto del Préstamo
               </p>
-              <p>{loan.interestRate}%</p>
+              <p className="text-lg font-semibold">
+                ${loan.amount.toLocaleString()}
+              </p>
             </div>
-          )}
-        </div>
-        <div className="mt-6">
-          <LoanPaymentChart
-            loanAmount={loan.amount}
-            balancePaid={loan.balance}
-          />
-        </div>
-      </CardContent>
-    </Card>
+            <div>
+              <p className="text-sm font-medium text-gray-500">Estado</p>
+              <Badge className={`${getStatusColor(loan.status)} text-white`}>
+                {getStatusText(loan.status)}
+              </Badge>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-500">
+                Fecha de Inicio
+              </p>
+              <p>{format(new Date(loan.startDate), "PP", { locale: es })}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-500">
+                Fecha de Vencimiento
+              </p>
+              <p>{format(new Date(loan.dueDate), "PP", { locale: es })}</p>
+            </div>
+            {loan.interestRate && (
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Tasa de Interés
+                </p>
+                <p>{loan.interestRate}%</p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+      <div className="mt-4 flex-grow sm:mt-8">
+        <LoanPaymentChart loanAmount={loan.amount} balancePaid={loan.balance} />
+      </div>
+    </div>
   );
 }

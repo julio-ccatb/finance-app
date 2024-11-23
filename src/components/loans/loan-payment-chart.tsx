@@ -36,12 +36,12 @@ export function LoanPaymentChart({
   const COLORS = ["#4ade80", "#f87171"];
 
   return (
-    <Card className="w-full">
+    <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-lg">Desglose de Pago del Préstamo</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col items-center justify-between sm:flex-row">
+        <div className="flex flex-col items-center justify-between">
           <div className="mb-4 h-[200px] w-full sm:mb-0 sm:h-[180px] sm:w-1/2">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>

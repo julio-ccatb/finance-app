@@ -5,6 +5,18 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ CREATE TYPE "public"."payment_status" AS ENUM('PENDING', 'COMPLETED', 'EXPIRED');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "public"."payment_type" AS ENUM('PAYMENT', 'INTREST', 'SURCHARGE');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  CREATE TYPE "public"."finance-app_roles" AS ENUM('NOT_VERIFIED', 'ADMIN', 'EDITOR', 'OPERATOR', 'READER', 'VIEWER');
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -38,10 +50,11 @@ CREATE TABLE IF NOT EXISTS "finance-app_loans" (
 	"id" varchar(255) PRIMARY KEY NOT NULL,
 	"borrower_id" varchar NOT NULL,
 	"amount" numeric(10, 2) NOT NULL,
-	"interest_rate" numeric(5, 2) DEFAULT '120.00',
+	"balance" numeric(10, 2) DEFAULT '0.00' NOT NULL,
+	"interest_rate" numeric(5, 2) DEFAULT '10.00',
 	"start_date" date NOT NULL,
 	"due_date" date NOT NULL,
-	"status" "finance-app_loan_statuses" DEFAULT 'ACTIVE',
+	"status" "finance-app_loan_statuses" DEFAULT 'ACTIVE' NOT NULL,
 	"created_at" date DEFAULT now()
 );
 --> statement-breakpoint
@@ -49,6 +62,8 @@ CREATE TABLE IF NOT EXISTS "finance-app_payments" (
 	"id" varchar(255) PRIMARY KEY NOT NULL,
 	"loan_id" varchar NOT NULL,
 	"amount" numeric(10, 2) NOT NULL,
+	"status" "payment_status" DEFAULT 'PENDING' NOT NULL,
+	"payment_type" "payment_type" DEFAULT 'INTREST' NOT NULL,
 	"payment_date" date DEFAULT now(),
 	"created_at" date DEFAULT now()
 );
