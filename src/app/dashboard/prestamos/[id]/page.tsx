@@ -8,6 +8,7 @@ import { LoanInfoCard } from "@/components/loans/loan-info-card";
 import { PaymentHistoryTable } from "@/components/loans/payment-history-table";
 import ThemeToggle from "@/components/mode-toggle";
 import { PageHeader } from "@/components/page-header";
+import { toast } from "@/hooks/use-toast";
 import { api } from "@/trpc/react";
 import { type LoansSelectInput } from "drizzle/schemas/loans";
 import { type PaymentsSelectInput } from "drizzle/schemas/payments";
@@ -25,12 +26,38 @@ export default function LoanDetailPage() {
   } = api.loans.findById.useQuery(loanId);
   const { mutate: generatePayment, isPending: isGeneratingPayment } =
     api.loans.generatePayment.useMutation({
-      onSuccess: () => refetch(),
+      onSuccess: () => {
+        toast({
+          title: "¡Pago generado exitosamente!",
+          description: "El pago ha sido generado correctamente.",
+        });
+        void refetch();
+      },
+      onError: (err) => {
+        toast({
+          variant: "destructive",
+          title: "¡Error al generar el pago!",
+          description: `Hubo un problema al generar el pago: ${err.message}`,
+        });
+      },
     });
-  const { mutate: applyPayment, isPending: isApplayingPayment } =
-    api.loans.applyPayment.useMutation({
-      onSuccess: () => refetch(),
-    });
+
+  const { mutate: applyPayment } = api.loans.applyPayment.useMutation({
+    onSuccess: () => {
+      toast({
+        title: "¡Pago aplicado exitosamente!",
+        description: "El pago ha sido aplicado correctamente.",
+      });
+      void refetch();
+    },
+    onError: (err) => {
+      toast({
+        variant: "destructive",
+        title: "¡Error al aplicar el pago!",
+        description: `Hubo un problema al aplicar el pago: ${err.message}`,
+      });
+    },
+  });
 
   const handleGeneratePayment = (
     type: "PAYMENT" | "INTREST" | "SURCHARGE",
