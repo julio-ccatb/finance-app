@@ -51,13 +51,33 @@ import {
 import { format, subYears, addYears } from "date-fns";
 import { es } from "date-fns/locale";
 import { type PaymentsSelectInput } from "drizzle/schemas/payments";
-import { CalendarIcon, FilterIcon, XCircleIcon, X } from "lucide-react";
+import {
+  CalendarIcon,
+  FilterIcon,
+  XCircleIcon,
+  X,
+  MoreHorizontal,
+  ClipboardCheck,
+  CircleX,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { type PaymentStatus } from "drizzle/schemas/payment-status";
+import { useIsMobile } from "../../hooks/use-mobile";
 
 interface PaymentHistoryTableProps {
   payments: PaymentsSelectInput[];
+  onUpdatePaymentStatus: (paymentId: string, status: PaymentStatus) => void;
 }
 
-export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
+export function PaymentHistoryTable({
+  payments,
+  onUpdatePaymentStatus,
+}: PaymentHistoryTableProps) {
   const getPaymentTypeText = (paymentType: string) => {
     switch (paymentType) {
       case "PAYMENT":
@@ -92,6 +112,13 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
 
   const columns: ColumnDef<PaymentsSelectInput>[] = [
     {
+      accessorKey: "amount",
+      header: "Monto",
+      cell: ({ row }) => (
+        <span>${parseFloat(row.original.amount).toLocaleString()}</span>
+      ),
+    },
+    {
       accessorKey: "paymentDate",
       header: "Fecha",
       cell: ({ row }) => (
@@ -114,13 +141,7 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
       },
       sortDescFirst: true,
     },
-    {
-      accessorKey: "amount",
-      header: "Monto",
-      cell: ({ row }) => (
-        <span>${parseFloat(row.original.amount).toLocaleString()}</span>
-      ),
-    },
+
     {
       accessorKey: "status",
       header: "Estado",
@@ -147,6 +168,38 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
         </Badge>
       ),
     },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        const payment = row.original;
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Abrir menú</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {payment.status !== "COMPLETED" && (
+                <DropdownMenuItem
+                  onClick={() => onUpdatePaymentStatus(payment.id, "COMPLETED")}
+                >
+                  <ClipboardCheck /> Aplicar
+                </DropdownMenuItem>
+              )}
+              {payment.status !== "EXPIRED" && (
+                <DropdownMenuItem
+                  onClick={() => onUpdatePaymentStatus(payment.id, "EXPIRED")}
+                >
+                  <CircleX /> Cancelar
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
   ];
 
   const [columnFilters, setColumnFilters] = React.useState<ColumnFilter[]>([]);
@@ -156,6 +209,8 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
   const [endDate, setEndDate] = React.useState<Date | undefined>(
     addYears(new Date(), 1),
   );
+
+  const isMobile = useIsMobile();
 
   const table = useReactTable({
     data: payments,
@@ -191,7 +246,7 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
     }
   }, [startDate, endDate, table]);
 
-  const isFiltered = table.getState().columnFilters.length > 0;
+  const isFiltered = table.getState().columnFilters.length > 1;
 
   return (
     <Card className="mt-8">
@@ -206,19 +261,24 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
           <div className="flex items-center gap-2">
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="w-[280px]">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+                <Button variant="outline" className="">
+                  <CalendarIcon className="" />
                   {startDate && endDate ? (
                     <>
-                      {format(startDate, "P", { locale: es })} -{" "}
-                      {format(endDate, "P", { locale: es })}
+                      {format(startDate, isMobile ? "d/MM" : "P", {
+                        locale: es,
+                      })}{" "}
+                      -{" "}
+                      {format(endDate, isMobile ? "d/MM" : "P", {
+                        locale: es,
+                      })}
                     </>
                   ) : (
                     <span>Seleccionar fechas</span>
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-fit p-0" align="start">
+              <PopoverContent className="w-auto p-0" align="start">
                 <div className="flex flex-col gap-2 p-3">
                   <DatePicker
                     date={startDate}
@@ -236,7 +296,11 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
 
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" size={"icon"}>
+                <Button
+                  variant="outline"
+                  size={"icon"}
+                  className="min-w-fit px-2"
+                >
                   <FilterIcon />
                 </Button>
               </DialogTrigger>
@@ -292,6 +356,18 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
                 </div>
               </DialogContent>
             </Dialog>
+
+            {isFiltered && (
+              <Button
+                variant="ghost"
+                onClick={() => table.resetColumnFilters()}
+                size={"icon"}
+              >
+                {/* Assuming FilterX is defined elsewhere */}
+                {/* <FilterX /> */}
+                <XCircleIcon className="mr-2 h-4 w-4" />
+              </Button>
+            )}
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -311,17 +387,6 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
               }
               return null;
             })}
-            {columnFilters.length > 1 && (
-              <Button
-                variant="ghost"
-                onClick={() => table.resetColumnFilters()}
-                size={"icon"}
-              >
-                {/* Assuming FilterX is defined elsewhere */}
-                {/* <FilterX /> */}
-                <XCircleIcon className="mr-2 h-4 w-4" />
-              </Button>
-            )}
           </div>
         </div>
 

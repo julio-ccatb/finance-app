@@ -58,7 +58,7 @@ export const loansRouter = createTRPCRouter({
       const [loan] = await ctx.db
         .select()
         .from(loans)
-        .where(eq(loans.id, input.loanId)); // Use the input (id) to filter the record
+        .where(eq(loans.id, input.loanId));
 
       if (!loan) {
         throw new TRPCError({
@@ -67,49 +67,26 @@ export const loansRouter = createTRPCRouter({
         });
       }
 
-      // Convert loan data to Decimal for accurate calculations
-      const loanAmount = new Decimal(loan.amount);
-      const loanBalance = new Decimal(loan.balance); // Total paid so far
       let paymentAmount: Decimal;
 
-      // Use switch-case to determine the payment amount
       switch (input.transaction) {
-        case "PAYMENT": {
-          if (!input.amount) {
-            throw new TRPCError({
-              code: "BAD_REQUEST",
-              message:
-                "El monto es requerido para el tipo de transacción 'PAYMENT'",
-            });
-          }
-          const inputAmount = new Decimal(input.amount);
-          paymentAmount = inputAmount;
-
-          // Update balance (add payment to balance)
-          const newBalance = loanBalance.plus(paymentAmount);
-          await ctx.db
-            .update(loans)
-            .set({ balance: newBalance.toString() })
-            .where(eq(loans.id, input.loanId));
-          break;
-        }
-        case "INTREST": {
-          // Interest is calculated on the remaining loan amount
-          const remainingAmount = loanAmount.minus(loanBalance);
-          const interest = new Decimal(loan.interestRate!).div(100);
-          paymentAmount = interest.mul(remainingAmount);
-          break;
-        }
+        case "PAYMENT":
         case "SURCHARGE": {
           if (!input.amount) {
             throw new TRPCError({
               code: "BAD_REQUEST",
-              message:
-                "El monto es requerido para el tipo de transacción 'SURCHARGE'",
+              message: `El monto es requerido para el tipo de transacción '${input.transaction}'`,
             });
           }
-          const inputAmount = new Decimal(input.amount);
-          paymentAmount = inputAmount;
+          paymentAmount = new Decimal(input.amount);
+          break;
+        }
+        case "INTREST": {
+          const loanAmount = new Decimal(loan.amount);
+          const loanBalance = new Decimal(loan.balance);
+          const remainingAmount = loanAmount.minus(loanBalance);
+          const interest = new Decimal(loan.interestRate!).div(100);
+          paymentAmount = interest.mul(remainingAmount);
           break;
         }
         default: {
@@ -127,5 +104,71 @@ export const loansRouter = createTRPCRouter({
       } as PaymentsCreateInput;
 
       await ctx.db.insert(payments).values(data);
+    }),
+  applyPayment: protectedProcedure
+    .input(
+      z.object({
+        loanId: z.string(),
+        paymentId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Fetch loan details
+      const [loan] = await ctx.db
+        .select()
+        .from(loans)
+        .where(eq(loans.id, input.loanId));
+
+      if (!loan) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Préstamo no encontrado",
+        });
+      }
+
+      // Fetch payment details
+      const [payment] = await ctx.db
+        .select()
+        .from(payments)
+        .where(eq(payments.id, input.paymentId));
+
+      if (!payment) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Pago no encontrado",
+        });
+      }
+
+      if (payment.status === "COMPLETED") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "El pago ya ha sido aplicado",
+        });
+      }
+
+      // Get the current loan balance
+      const loanBalance = new Decimal(loan.balance);
+      const paymentAmount = new Decimal(payment.amount);
+
+      // Update the loan balance only if the payment type is NOT "INTEREST"
+      let newBalance = loanBalance;
+      if (payment.paymentType !== "INTREST") {
+        newBalance = loanBalance.plus(paymentAmount);
+      }
+
+      // Update loan balance and status
+      await ctx.db
+        .update(loans)
+        .set({
+          balance: newBalance.toString(),
+          status: newBalance.gte(loan.amount) ? "COMPLETED" : loan.status,
+        })
+        .where(eq(loans.id, input.loanId));
+
+      // Update payment status to COMPLETED
+      await ctx.db
+        .update(payments)
+        .set({ status: "COMPLETED" })
+        .where(eq(payments.id, input.paymentId));
     }),
 });

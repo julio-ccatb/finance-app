@@ -27,6 +27,10 @@ export default function LoanDetailPage() {
     api.loans.generatePayment.useMutation({
       onSuccess: () => refetch(),
     });
+  const { mutate: applyPayment, isPending: isApplayingPayment } =
+    api.loans.applyPayment.useMutation({
+      onSuccess: () => refetch(),
+    });
 
   const handleGeneratePayment = (
     type: "PAYMENT" | "INTREST" | "SURCHARGE",
@@ -43,6 +47,9 @@ export default function LoanDetailPage() {
       console.error("Error generating payment:", error);
       // Handle error (e.g., show error message to user)
     }
+  };
+  const handleUpdatePayment = (paymentId: string) => {
+    applyPayment({ loanId, paymentId });
   };
 
   return (
@@ -73,6 +80,7 @@ export default function LoanDetailPage() {
             />
             {loan.payments.length > 0 && (
               <PaymentHistoryTable
+                onUpdatePaymentStatus={(data) => handleUpdatePayment(data)}
                 payments={loan.payments as PaymentsSelectInput[]}
               />
             )}
