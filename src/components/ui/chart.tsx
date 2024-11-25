@@ -117,6 +117,7 @@ const ChartTooltipContent = React.forwardRef<
       indicator?: "line" | "dot" | "dashed";
       nameKey?: string;
       labelKey?: string;
+      sufix?: string;
     }
 >(
   (
@@ -134,6 +135,7 @@ const ChartTooltipContent = React.forwardRef<
       color,
       nameKey,
       labelKey,
+      sufix,
     },
     ref,
   ) => {
@@ -247,6 +249,7 @@ const ChartTooltipContent = React.forwardRef<
                       {item.value && (
                         <span className="font-mono font-medium tabular-nums text-foreground">
                           {item.value.toLocaleString()}
+                          {sufix}
                         </span>
                       )}
                     </div>

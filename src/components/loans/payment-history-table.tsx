@@ -57,8 +57,7 @@ import {
   XCircleIcon,
   X,
   MoreHorizontal,
-  ClipboardCheck,
-  CircleX,
+  ArrowUpDown,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -67,7 +66,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { type PaymentStatus } from "drizzle/schemas/payment-status";
-import { useIsMobile } from "../../hooks/use-mobile";
+import { formatCurrency } from "@/lib/currency";
 
 interface PaymentHistoryTableProps {
   payments: PaymentsSelectInput[];
@@ -112,13 +111,6 @@ export function PaymentHistoryTable({
 
   const columns: ColumnDef<PaymentsSelectInput>[] = [
     {
-      accessorKey: "amount",
-      header: "Monto",
-      cell: ({ row }) => (
-        <span>${parseFloat(row.original.amount).toLocaleString()}</span>
-      ),
-    },
-    {
       accessorKey: "paymentDate",
       header: "Fecha",
       cell: ({ row }) => (
@@ -141,7 +133,43 @@ export function PaymentHistoryTable({
       },
       sortDescFirst: true,
     },
-
+    {
+      accessorKey: "amount",
+      header: "Monto",
+      cell: ({ row }) => (
+        <span>{formatCurrency(parseFloat(row.original.amount))}</span>
+      ),
+    },
+    {
+      accessorKey: "paymentType",
+      header: "Tipo",
+      cell: ({ row }) => {
+        const paymentType = row.original.paymentType;
+        let badgeColor = "";
+        switch (paymentType) {
+          case "PAYMENT":
+            badgeColor =
+              "!bg-blue-100 !text-blue-800 !dark:bg-blue-900 !dark:text-blue-300";
+            break;
+          case "INTREST":
+            badgeColor =
+              "!bg-purple-100 !text-purple-800 !dark:bg-purple-900 !dark:text-purple-300";
+            break;
+          case "SURCHARGE":
+            badgeColor =
+              "!bg-orange-100 !text-orange-800 !dark:bg-orange-900 !dark:text-orange-300";
+            break;
+          default:
+            badgeColor =
+              "!bg-gray-100 !text-gray-800 !dark:bg-gray-700 !dark:text-gray-300";
+        }
+        return (
+          <Badge className={`${badgeColor}`}>
+            {getPaymentTypeText(paymentType)}
+          </Badge>
+        );
+      },
+    },
     {
       accessorKey: "status",
       header: "Estado",
@@ -159,15 +187,7 @@ export function PaymentHistoryTable({
         </Badge>
       ),
     },
-    {
-      accessorKey: "paymentType",
-      header: "Tipo",
-      cell: ({ row }) => (
-        <Badge variant="outline">
-          {getPaymentTypeText(row.original.paymentType)}
-        </Badge>
-      ),
-    },
+
     {
       id: "actions",
       cell: ({ row }) => {
@@ -185,14 +205,14 @@ export function PaymentHistoryTable({
                 <DropdownMenuItem
                   onClick={() => onUpdatePaymentStatus(payment.id, "COMPLETED")}
                 >
-                  <ClipboardCheck /> Aplicar
+                  Marcar como completado
                 </DropdownMenuItem>
               )}
               {payment.status !== "EXPIRED" && (
                 <DropdownMenuItem
                   onClick={() => onUpdatePaymentStatus(payment.id, "EXPIRED")}
                 >
-                  <CircleX /> Cancelar
+                  Marcar como expirado
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>
@@ -210,8 +230,6 @@ export function PaymentHistoryTable({
     addYears(new Date(), 1),
   );
 
-  const isMobile = useIsMobile();
-
   const table = useReactTable({
     data: payments,
     columns,
@@ -227,12 +245,7 @@ export function PaymentHistoryTable({
       pagination: {
         pageSize: 10,
       },
-      sorting: [
-        {
-          id: "paymentDate",
-          desc: true,
-        },
-      ],
+      sorting: [],
     },
   });
 
@@ -261,17 +274,12 @@ export function PaymentHistoryTable({
           <div className="flex items-center gap-2">
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="">
-                  <CalendarIcon className="" />
+                <Button variant="outline" className="w-[280px]">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
                   {startDate && endDate ? (
                     <>
-                      {format(startDate, isMobile ? "d/MM" : "P", {
-                        locale: es,
-                      })}{" "}
-                      -{" "}
-                      {format(endDate, isMobile ? "d/MM" : "P", {
-                        locale: es,
-                      })}
+                      {format(startDate, "P", { locale: es })} -{" "}
+                      {format(endDate, "P", { locale: es })}
                     </>
                   ) : (
                     <span>Seleccionar fechas</span>
@@ -296,11 +304,7 @@ export function PaymentHistoryTable({
 
             <Dialog>
               <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  size={"icon"}
-                  className="min-w-fit px-2"
-                >
+                <Button variant="outline" size={"icon"}>
                   <FilterIcon />
                 </Button>
               </DialogTrigger>
@@ -356,18 +360,6 @@ export function PaymentHistoryTable({
                 </div>
               </DialogContent>
             </Dialog>
-
-            {isFiltered && (
-              <Button
-                variant="ghost"
-                onClick={() => table.resetColumnFilters()}
-                size={"icon"}
-              >
-                {/* Assuming FilterX is defined elsewhere */}
-                {/* <FilterX /> */}
-                <XCircleIcon className="mr-2 h-4 w-4" />
-              </Button>
-            )}
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -387,6 +379,17 @@ export function PaymentHistoryTable({
               }
               return null;
             })}
+            {isFiltered && (
+              <Button
+                variant="link"
+                onClick={() => table.resetColumnFilters()}
+                size={"icon"}
+              >
+                {/* Assuming FilterX is defined elsewhere */}
+                {/* <FilterX /> */}
+                <XCircleIcon />
+              </Button>
+            )}
           </div>
         </div>
 
@@ -396,13 +399,26 @@ export function PaymentHistoryTable({
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
+                    <TableHead key={header.id} className={header.id}>
+                      {header.isPlaceholder ? null : (
+                        <div
+                          className={
+                            header.column.getCanSort()
+                              ? "flex cursor-pointer select-none items-center"
+                              : ""
+                          }
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          {flexRender(
                             header.column.columnDef.header,
                             header.getContext(),
                           )}
+                          {{
+                            asc: <ArrowUpDown className="ml-2 h-4 w-4" />,
+                            desc: <ArrowUpDown className="ml-2 h-4 w-4" />,
+                          }[header.column.getIsSorted() as string] ?? null}
+                        </div>
+                      )}
                     </TableHead>
                   ))}
                 </TableRow>

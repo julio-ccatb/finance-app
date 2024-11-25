@@ -23,6 +23,7 @@ import { ExternalLink, CreditCard } from "lucide-react";
 import { type LoansSelectInput } from "drizzle/schemas/loans";
 import { ROUTES } from "@/app/_components/utils/routes";
 import { useRouter } from "next/navigation";
+import { formatCurrency } from "@/lib/currency";
 
 type BorrowerLoansModalProps = {
   isOpen: boolean;
@@ -57,13 +58,13 @@ export function BorrowerLoansModal({
   const getStatusColor = (status: LoansSelectInput["status"]) => {
     switch (status) {
       case "ACTIVE":
-        return "!bg-green-500";
+        return "bg-green-500";
       case "COMPLETED":
-        return "!bg-blue-500";
+        return "bg-blue-500";
       case "DEFAULTED":
-        return "!bg-red-500";
+        return "bg-red-500";
       default:
-        return "!bg-gray-500";
+        return "bg-gray-500";
     }
   };
 
@@ -84,14 +85,14 @@ export function BorrowerLoansModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-h-[90vh] w-11/12 max-w-[95vw] overflow-hidden sm:max-w-[700px]">
         <DialogHeader>
-          <DialogTitle className="text-lg sm:text-xl md:text-2xl">
+          <DialogTitle className="text-lg font-semibold sm:text-xl md:text-2xl">
             Préstamos de {borrower.name}
           </DialogTitle>
         </DialogHeader>
         <ScrollArea className="mt-2 max-h-[calc(90vh-120px)] px-1 sm:px-2">
           {loans.length === 0 ? (
             <div className="py-8 text-center">
-              <p className="text-lg text-gray-500">
+              <p className="text-lg text-muted-foreground">
                 No hay préstamos registrados para este prestatario.
               </p>
             </div>
@@ -104,9 +105,9 @@ export function BorrowerLoansModal({
                 >
                   <div className="flex-grow">
                     <CardHeader className="pb-2 sm:pb-4 sm:pt-4">
-                      <CardTitle className="flex items-center justify-between text-base sm:text-lg">
-                        <span className="text-sm font-semibold sm:text-base">
-                          ${loan.amount.toLocaleString()}
+                      <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                        <span className="font-semibold">
+                          {formatCurrency(parseFloat(loan.amount))}
                         </span>
                         <Badge
                           className={`${getStatusColor(loan.status)} px-2 py-1 text-xs text-white`}
@@ -115,38 +116,36 @@ export function BorrowerLoansModal({
                         </Badge>
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="py-2 sm:py-4">
-                      <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-3 sm:text-sm">
-                        <div>
-                          <strong className="block">Inicio:</strong>
-                          <span>
-                            {format(new Date(loan.startDate), "PP", {
-                              locale: es,
-                            })}
-                          </span>
-                        </div>
-                        <div>
-                          <strong className="block">Vencimiento:</strong>
-                          <span>
-                            {format(new Date(loan.dueDate), "PP", {
-                              locale: es,
-                            })}
-                          </span>
-                        </div>
-                        {loan.interestRate !== null && (
-                          <div>
-                            <strong className="block">Tasa de interés:</strong>
-                            <span>{loan.interestRate}%</span>
-                          </div>
-                        )}
+                    <CardContent className="grid grid-cols-2 gap-2 py-2 text-xs sm:grid-cols-3 sm:py-4 sm:text-sm">
+                      <div>
+                        <strong className="block">Inicio:</strong>
+                        <span>
+                          {format(new Date(loan.startDate), "PP", {
+                            locale: es,
+                          })}
+                        </span>
                       </div>
+                      <div>
+                        <strong className="block">Vencimiento:</strong>
+                        <span>
+                          {format(new Date(loan.dueDate), "PP", {
+                            locale: es,
+                          })}
+                        </span>
+                      </div>
+                      {loan.interestRate !== null && (
+                        <div>
+                          <strong className="block">Tasa de interés:</strong>
+                          <span>{loan.interestRate}%</span>
+                        </div>
+                      )}
                     </CardContent>
                   </div>
-                  <CardFooter className="flex flex-row justify-between gap-2 px-2 pt-2 sm:w-44 sm:flex-col sm:justify-center sm:p-4 sm:px-4">
+                  <CardFooter className="flex flex-row justify-between gap-2 px-2 pt-2 sm:w-44 sm:flex-col sm:justify-center sm:p-4">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="h-8 flex-1 px-1 py-1 text-xs sm:h-10 sm:w-full sm:px-2 sm:text-sm"
+                      className="h-8 flex-1 px-2 py-1 text-xs sm:h-10 sm:w-full sm:text-sm"
                       onClick={() => handleGeneratePayment(loan.id)}
                       disabled={
                         isGeneratingPayment === loan.id ||
@@ -165,7 +164,7 @@ export function BorrowerLoansModal({
                     <Button
                       variant="outline"
                       size="sm"
-                      className="h-8 flex-1 px-1 py-1 text-xs sm:h-10 sm:w-full sm:px-2 sm:text-sm"
+                      className="h-8 flex-1 px-2 py-1 text-xs sm:h-10 sm:w-full sm:text-sm"
                       onClick={() => router.push(`${ROUTES.LOANS}/${loan.id}`)}
                     >
                       <ExternalLink className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />

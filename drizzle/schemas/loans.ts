@@ -17,6 +17,12 @@ export const loans = createTable("loans", {
     .notNull()
     .references(() => borrowers.id), // Foreign key linking to the borrower
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(), // Total loan amount
+  surcharge: numeric("surcharge", { precision: 10, scale: 2 })
+    .notNull()
+    .default("0.00"), // Total loan surcharge
+  winnings: numeric("winnings", { precision: 10, scale: 2 })
+    .notNull()
+    .default("0.00"), // Total loan surcharge
   balance: numeric("balance", { precision: 10, scale: 2 })
     .notNull()
     .default("0.00"), // Amount paid by the borrower
@@ -39,6 +45,8 @@ export const loansRelations = relations(loans, ({ one, many }) => ({
 
 export const LoansInsertSchema = createInsertSchema(loans, {
   amount: decimalStringValidator,
+  surcharge: decimalStringValidator,
+  winnings: decimalStringValidator,
   balance: decimalStringValidator,
   interestRate: decimalStringValidator,
 });

@@ -13,12 +13,12 @@ import { api } from "@/trpc/react";
 import { type LoansSelectInput } from "drizzle/schemas/loans";
 import { type PaymentsSelectInput } from "drizzle/schemas/payments";
 import { motion } from "framer-motion";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function LoanDetailPage() {
   const params = useParams();
   const loanId = params.id as string;
-
+  const router = useRouter();
   const {
     data: loan,
     isLoading,
@@ -58,6 +58,8 @@ export default function LoanDetailPage() {
       });
     },
   });
+
+  if (!isLoading && !loan) router.replace(ROUTES.NOT_FOUND);
 
   const handleGeneratePayment = (
     type: "PAYMENT" | "INTREST" | "SURCHARGE",

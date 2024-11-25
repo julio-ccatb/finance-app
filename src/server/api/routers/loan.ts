@@ -79,6 +79,18 @@ export const loansRouter = createTRPCRouter({
             });
           }
           paymentAmount = new Decimal(input.amount);
+
+          // For 'SURCHARGE', add the amount to the loan's surcharge when created
+          if (input.transaction === "SURCHARGE") {
+            await ctx.db
+              .update(loans)
+              .set({
+                surcharge: new Decimal(loan.surcharge)
+                  .plus(paymentAmount)
+                  .toString(),
+              })
+              .where(eq(loans.id, input.loanId));
+          }
           break;
         }
         case "INTREST": {
@@ -105,6 +117,7 @@ export const loansRouter = createTRPCRouter({
 
       await ctx.db.insert(payments).values(data);
     }),
+
   applyPayment: protectedProcedure
     .input(
       z.object({
@@ -146,22 +159,47 @@ export const loansRouter = createTRPCRouter({
         });
       }
 
-      // Get the current loan balance
+      // Get the current loan values
       const loanBalance = new Decimal(loan.balance);
       const paymentAmount = new Decimal(payment.amount);
+      const loanSurcharge = new Decimal(loan.surcharge);
+      const loanWinnings = new Decimal(loan.winnings);
 
-      // Update the loan balance only if the payment type is NOT "INTEREST"
+      // Initialize new balance, surcharge, and winnings
       let newBalance = loanBalance;
-      if (payment.paymentType !== "INTREST") {
-        newBalance = loanBalance.plus(paymentAmount);
+      let newSurcharge = loanSurcharge;
+      let newWinnings = loanWinnings;
+
+      switch (payment.paymentType) {
+        case "PAYMENT":
+          // Add the payment to the loan balance
+          newBalance = loanBalance.plus(paymentAmount);
+          break;
+        case "SURCHARGE":
+          // Subtract the payment from the surcharge when applied
+          newSurcharge = loanSurcharge.minus(paymentAmount);
+          // Add the surcharge payment amount to the winnings
+          newWinnings = loanWinnings.plus(paymentAmount);
+          break;
+        case "INTREST":
+          // Add the interest amount to winnings
+          newWinnings = loanWinnings.plus(paymentAmount);
+          break;
+        default:
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Tipo de pago no válido",
+          });
       }
 
-      // Update loan balance and status
+      // Update loan balance, surcharge, winnings, and status
       await ctx.db
         .update(loans)
         .set({
           balance: newBalance.toString(),
-          status: newBalance.gte(loan.amount) ? "COMPLETED" : loan.status,
+          surcharge: newSurcharge.toString(),
+          winnings: newWinnings.toString(),
+          status: newBalance.gte(loan.amount) ? "COMPLETED" : loan.status, // Set status to COMPLETED if balance is fully paid
         })
         .where(eq(loans.id, input.loanId));
 

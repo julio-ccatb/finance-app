@@ -16,7 +16,6 @@ import {
 import {
   ChartContainer,
   ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
@@ -25,36 +24,41 @@ import { type PieSectorDataItem } from "recharts/types/polar/Pie";
 interface LoanPaymentChartProps {
   loanAmount: string;
   balancePaid: string;
+  winnings: string;
 }
 
 export function LoanPaymentChart({
   loanAmount,
   balancePaid,
+  winnings,
 }: LoanPaymentChartProps) {
   const remainingBalance = parseFloat(
     new Decimal(loanAmount).minus(balancePaid).toString(),
   );
   const paidPercentage = parseFloat(
-    new Decimal(balancePaid).div(loanAmount).mul(100).toString(),
-  ).toFixed(2);
+    new Decimal(balancePaid).div(loanAmount).mul(100).toFixed(2).toString(),
+  );
   const remainingPercentage = parseFloat(
     new Decimal(remainingBalance).div(loanAmount).mul(100).toString(),
+  );
+  const winningsPorcentage = parseFloat(
+    new Decimal(winnings).div(loanAmount).mul(100).toString(),
   );
 
   const chartData = [
     {
-      name: "Pagado",
-      value: parseFloat(paidPercentage),
-      fill: "hsl(var(--chart-1))",
-    },
-    {
-      name: "Restante",
-      value: remainingPercentage,
+      namelabel: "Pagado",
+      value: paidPercentage,
       fill: "hsl(var(--chart-2))",
     },
     {
-      name: "Ganancias",
+      namelabel: "Restante",
       value: remainingPercentage,
+      fill: "hsl(var(--chart-1))",
+    },
+    {
+      namelabel: "Ganancias",
+      value: winningsPorcentage,
       fill: "hsl(var(--chart-3))",
     },
   ];
@@ -88,12 +92,12 @@ export function LoanPaymentChart({
           <PieChart>
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent>L</ChartTooltipContent>}
+              content={<ChartTooltipContent sufix="%" />}
             />
             <Pie
               data={chartData}
               dataKey="value"
-              nameKey="name"
+              nameKey="namelabel"
               innerRadius={60}
               outerRadius={80}
               strokeWidth={5}
@@ -109,31 +113,41 @@ export function LoanPaymentChart({
                 <Cell key={`cell-${index}`} fill={entry.fill} />
               ))}
             </Pie>
+            <ChartLegend className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center" />
           </PieChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-4 pt-4">
-        <div className="grid w-full grid-cols-2 gap-4 text-center">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Pagado</p>
-            <p className="text-lg font-semibold">{paidPercentage}%</p>
-            <p className="text-sm text-muted-foreground">
-              ${parseFloat(balancePaid).toLocaleString()}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">
-              Restante
-            </p>
-            <p className="text-lg font-semibold">
-              {remainingPercentage.toFixed(2)}%
-            </p>
-            <p className="text-sm text-muted-foreground">
-              ${remainingBalance.toLocaleString()}
-            </p>
-          </div>
+      <CardFooter className="flex flex-col gap-4 pt-4">
+        <div className="grid w-full grid-cols-3 gap-4 text-center">
+          {[
+            {
+              label: "Pagado",
+              percentage: paidPercentage,
+              amount: balancePaid,
+            },
+            {
+              label: "Ganancias",
+              percentage: winningsPorcentage,
+              amount: winnings,
+            },
+            {
+              label: "Restante",
+              percentage: remainingPercentage,
+              amount: remainingBalance,
+            },
+          ].map(({ label, percentage, amount }) => (
+            <div key={label} className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">
+                {label}
+              </p>
+              <p className="text-lg font-semibold">{percentage.toFixed(2)}%</p>
+              <p className="text-sm text-muted-foreground">
+                ${amount.toLocaleString()}
+              </p>
+            </div>
+          ))}
         </div>
-        <div className="flex items-center justify-center gap-2 text-sm font-medium leading-none">
+        <div className="flex items-center justify-center gap-2 text-sm font-medium">
           <TrendingUp className="h-4 w-4" />
           <span>Progreso del pago del préstamo</span>
         </div>
