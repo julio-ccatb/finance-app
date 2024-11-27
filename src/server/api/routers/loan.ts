@@ -1,7 +1,7 @@
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import Decimal from "decimal.js";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import {
   loans,
   LoansInsertSchema,
@@ -15,7 +15,10 @@ export const loansRouter = createTRPCRouter({
   create: protectedProcedure
     .input(LoansInsertSchema)
     .mutation(async ({ ctx, input }) => {
-      const result = await ctx.db.insert(loans).values(input);
+      if (!ctx.session.user) throw new TRPCError({ code: "BAD_REQUEST" });
+      const result = await ctx.db
+        .insert(loans)
+        .values({ ...input, ownerId: ctx.session.user.id });
       console.log(result);
       return result;
     }),
@@ -29,14 +32,19 @@ export const loansRouter = createTRPCRouter({
   findById: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
+      if (!ctx.session.user) throw new TRPCError({ code: "BAD_REQUEST" });
       const loan = await ctx.db
         .select()
         .from(loans)
         .leftJoin(payments, eq(loans.id, payments.loanId))
-        .where(eq(loans.id, input)); // Use the input (id) to filter the record
+        .where(
+          and(eq(loans.id, input), eq(loans.ownerId, ctx.session.user.id)),
+        ); // Use the input (id) to filter the record
+
+      if (!loan[0]) throw new TRPCError({ code: "NOT_FOUND" });
 
       const formatedLoan = {
-        ...loan[0]?.loans,
+        ...loan[0].loans,
         payments: loan.map((item) => item.payments).filter(Boolean), // Keep only truthy (non-null) payment objects
       };
 

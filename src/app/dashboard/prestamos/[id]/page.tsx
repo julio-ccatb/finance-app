@@ -23,6 +23,7 @@ export default function LoanDetailPage() {
     data: loan,
     isLoading,
     refetch,
+    error,
   } = api.loans.findById.useQuery(loanId);
   const { mutate: generatePayment, isPending: isGeneratingPayment } =
     api.loans.generatePayment.useMutation({
@@ -60,6 +61,7 @@ export default function LoanDetailPage() {
   });
 
   if (!isLoading && !loan) router.replace(ROUTES.NOT_FOUND);
+  if (error?.data?.code === "NOT_FOUND") router.replace(ROUTES.NOT_FOUND);
 
   const handleGeneratePayment = (
     type: "PAYMENT" | "INTREST" | "SURCHARGE",

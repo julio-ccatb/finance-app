@@ -19,10 +19,14 @@ export const borrowerRouter = createTRPCRouter({
   list: protectedProcedure
     .input(BorrowersSelectSchema.optional())
     .query(async ({ ctx }) => {
+      const user = ctx.session.user;
+      console.log(user.id);
       const queryResult = await ctx.db
+
         .select()
         .from(borrowers)
-        .leftJoin(loans, eq(borrowers.id, loans.borrowerId));
+        .leftJoin(loans, eq(borrowers.id, loans.borrowerId))
+        .where(eq(loans.ownerId, user.id));
 
       // Group loans by borrower ID
       const groupedByBorrower = groupBy(
