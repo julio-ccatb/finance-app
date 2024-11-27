@@ -192,6 +192,7 @@ export function PaymentHistoryTable({
       id: "actions",
       cell: ({ row }) => {
         const payment = row.original;
+        if (payment.status === "COMPLETED") return null;
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -201,13 +202,12 @@ export function PaymentHistoryTable({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {payment.status !== "COMPLETED" && (
-                <DropdownMenuItem
-                  onClick={() => onUpdatePaymentStatus(payment.id, "COMPLETED")}
-                >
-                  Marcar como completado
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem
+                onClick={() => onUpdatePaymentStatus(payment.id, "COMPLETED")}
+              >
+                Marcar como completado
+              </DropdownMenuItem>
+
               {payment.status !== "EXPIRED" && (
                 <DropdownMenuItem
                   onClick={() => onUpdatePaymentStatus(payment.id, "EXPIRED")}

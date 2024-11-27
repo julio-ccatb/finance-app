@@ -103,10 +103,12 @@ export default function LoanDetailPage() {
         ) : loan ? (
           <>
             <LoanInfoCard loan={loan as LoansSelectInput} />
-            <ActionButtons
-              onGeneratePayment={handleGeneratePayment}
-              isGeneratingPayment={isGeneratingPayment}
-            />
+            {loan.status !== "COMPLETED" && (
+              <ActionButtons
+                onGeneratePayment={handleGeneratePayment}
+                isGeneratingPayment={isGeneratingPayment}
+              />
+            )}
             {loan.payments.length > 0 && (
               <PaymentHistoryTable
                 onUpdatePaymentStatus={(data) => handleUpdatePayment(data)}
