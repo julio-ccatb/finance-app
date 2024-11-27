@@ -7,12 +7,15 @@ import { type z } from "zod";
 import { borrowers } from "./borrowers";
 import { loanStatuses } from "./loan-status";
 import { payments } from "./payments";
+import { users } from "./schema";
 
 export const loans = createTable("loans", {
   id: varchar("id", { length: 255 })
     .notNull()
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()), // UUID as a string
+
+  ownerId: varchar("owner_id").references(() => users.id), // Foreign key linking to the borrower
   borrowerId: varchar("borrower_id")
     .notNull()
     .references(() => borrowers.id), // Foreign key linking to the borrower
@@ -39,6 +42,10 @@ export const loansRelations = relations(loans, ({ one, many }) => ({
   borrower: one(borrowers, {
     fields: [loans.borrowerId],
     references: [borrowers.id],
+  }),
+  owner: one(users, {
+    fields: [loans.ownerId],
+    references: [users.id],
   }),
   payments: many(payments),
 }));

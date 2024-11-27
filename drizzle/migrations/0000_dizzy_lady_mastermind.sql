@@ -48,8 +48,11 @@ CREATE TABLE IF NOT EXISTS "finance-app_borrowers" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "finance-app_loans" (
 	"id" varchar(255) PRIMARY KEY NOT NULL,
+	"owner_id" varchar,
 	"borrower_id" varchar NOT NULL,
 	"amount" numeric(10, 2) NOT NULL,
+	"surcharge" numeric(10, 2) DEFAULT '0.00' NOT NULL,
+	"winnings" numeric(10, 2) DEFAULT '0.00' NOT NULL,
 	"balance" numeric(10, 2) DEFAULT '0.00' NOT NULL,
 	"interest_rate" numeric(5, 2) DEFAULT '10.00',
 	"start_date" date NOT NULL,
@@ -115,6 +118,12 @@ CREATE TABLE IF NOT EXISTS "finance-app_verification_token" (
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "finance-app_transactions" ADD CONSTRAINT "finance-app_transactions_book_id_finance-app_books_id_fk" FOREIGN KEY ("book_id") REFERENCES "public"."finance-app_books"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "finance-app_loans" ADD CONSTRAINT "finance-app_loans_owner_id_finance-app_borrowers_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."finance-app_borrowers"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

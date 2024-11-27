@@ -59,6 +59,7 @@ export const users = createTable("user", {
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
+  loans: many(loans),
 }));
 
 export const accounts = createTable(

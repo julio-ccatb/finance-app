@@ -1,6 +1,6 @@
 {
-  "id": "d3527db7-3399-4ff7-acca-9d71d494dab0",
-  "prevId": "8395d9bf-e03e-4f24-ae46-60d9e1b9cccb",
+  "id": "e8b6bf0e-d6ec-4cf0-ab9a-3f9a67406958",
+  "prevId": "69036dbb-2d6c-4534-be15-7bba2d97c8e4",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -173,6 +173,12 @@
           "primaryKey": true,
           "notNull": true
         },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "borrower_id": {
           "name": "borrower_id",
           "type": "varchar",
@@ -183,11 +189,17 @@
           "name": "amount",
           "type": "numeric(10, 2)",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'0.00'"
+          "notNull": true
         },
         "surcharge": {
           "name": "surcharge",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0.00'"
+        },
+        "winnings": {
+          "name": "winnings",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true,
@@ -237,6 +249,19 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "finance-app_loans_owner_id_finance-app_user_id_fk": {
+          "name": "finance-app_loans_owner_id_finance-app_user_id_fk",
+          "tableFrom": "finance-app_loans",
+          "tableTo": "finance-app_user",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "finance-app_loans_borrower_id_finance-app_borrowers_id_fk": {
           "name": "finance-app_loans_borrower_id_finance-app_borrowers_id_fk",
           "tableFrom": "finance-app_loans",
