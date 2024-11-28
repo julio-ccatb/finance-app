@@ -133,7 +133,7 @@ export function CreateBorrowerForm({
             <FormField
               control={form.control}
               name="phone"
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <FormLabel>Teléfono</FormLabel>
                   <FormControl>

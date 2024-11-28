@@ -1,19 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import type * as z from "zod";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -25,7 +19,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
@@ -38,11 +31,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
+import { loanStatusArray } from "drizzle/schemas/loan-status";
 import {
   type LoansCreateInput,
   LoansInsertSchema,
 } from "drizzle/schemas/loans";
-import { loanStatusArray } from "drizzle/schemas/loan-status";
+import { CalendarIcon } from "lucide-react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import type * as z from "zod";
 
 const formSchema = LoansInsertSchema;
 
@@ -71,6 +70,7 @@ export function CreateLoanModal({
 
   useEffect(
     () => form.setValue("borrowerId", borrowerId, { shouldValidate: true }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
