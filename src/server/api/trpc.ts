@@ -13,6 +13,7 @@ import { ZodError } from "zod";
 
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
+import { type Roles } from "drizzle/schemas/roles";
 
 /**
  * 1. CONTEXT
@@ -100,6 +101,22 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
 
   return result;
 });
+
+export const VerifyRoles = (admitedRoles: Roles[]) =>
+  t.middleware(({ ctx, next }) => {
+    // Verification logic
+
+    if (!ctx.session || !ctx.session.user)
+      throw new TRPCError({ code: "BAD_REQUEST" });
+
+    const isAllowed = admitedRoles.includes(ctx.session.user.roles);
+
+    if (!isAllowed) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+    return next({
+      ctx,
+    });
+  });
 
 /**
  * Public (unauthenticated) procedure
