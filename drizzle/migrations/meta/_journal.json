@@ -5,22 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1732365729290,
-      "tag": "0000_zippy_rictor",
+      "when": 1732709584218,
+      "tag": "0000_dizzy_lady_mastermind",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1732547646630,
-      "tag": "0001_furry_stone_men",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1732550529104,
-      "tag": "0002_broken_bishop",
+      "when": 1732709839192,
+      "tag": "0001_demonic_wiccan",
       "breakpoints": true
     }
   ]

@@ -23,6 +23,7 @@ export default function LoanDetailPage() {
     data: loan,
     isLoading,
     refetch,
+    error,
   } = api.loans.findById.useQuery(loanId);
   const { mutate: generatePayment, isPending: isGeneratingPayment } =
     api.loans.generatePayment.useMutation({
@@ -60,6 +61,7 @@ export default function LoanDetailPage() {
   });
 
   if (!isLoading && !loan) router.replace(ROUTES.NOT_FOUND);
+  if (error?.data?.code === "NOT_FOUND") router.replace(ROUTES.NOT_FOUND);
 
   const handleGeneratePayment = (
     type: "PAYMENT" | "INTREST" | "SURCHARGE",
@@ -103,10 +105,12 @@ export default function LoanDetailPage() {
         ) : loan ? (
           <>
             <LoanInfoCard loan={loan as LoansSelectInput} />
-            <ActionButtons
-              onGeneratePayment={handleGeneratePayment}
-              isGeneratingPayment={isGeneratingPayment}
-            />
+            {loan.status !== "COMPLETED" && (
+              <ActionButtons
+                onGeneratePayment={handleGeneratePayment}
+                isGeneratingPayment={isGeneratingPayment}
+              />
+            )}
             {loan.payments.length > 0 && (
               <PaymentHistoryTable
                 onUpdatePaymentStatus={(data) => handleUpdatePayment(data)}

@@ -136,6 +136,10 @@ const data = {
           title: "Preferencias",
           url: "/configuracion/preferencias",
         },
+        {
+          title: "Usuarios",
+          url: ROUTES.SETTINGS_USERS,
+        },
       ],
     },
   ],

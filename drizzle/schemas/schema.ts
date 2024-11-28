@@ -13,6 +13,8 @@ import { borrowers } from "./borrowers";
 import { loans } from "./loans";
 import { payments } from "./payments";
 import { roles } from "./roles";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -59,6 +61,7 @@ export const users = createTable("user", {
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
+  loans: many(loans),
 }));
 
 export const accounts = createTable(
@@ -116,6 +119,10 @@ export const sessions = createTable(
 export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }));
+export const userInsertSchema = createInsertSchema(users);
+export const userSelectSchema = createSelectSchema(users);
+export type userCreateInput = z.infer<typeof userInsertSchema>;
+export type userSelectInput = z.infer<typeof userSelectSchema>;
 
 export const verificationTokens = createTable(
   "verification_token",
