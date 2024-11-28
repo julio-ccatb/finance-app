@@ -16,7 +16,6 @@ export default function UserManagementPage() {
   const [selectedUser, setSelectedUser] = useState<userSelectInput | null>(
     null,
   );
-  const [newRole, setNewRole] = useState<Roles>("NOT_VERIFIED");
 
   const { data: users, refetch: refetchUsers } = api.users.list.useQuery();
   const roles: Roles[] = [

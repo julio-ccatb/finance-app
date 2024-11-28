@@ -40,7 +40,7 @@ interface UserTableProps {
 export function UserTable({
   users,
   onAddRole,
-  onRemoveRole,
+  // onRemoveRole,
   availableRoles,
 }: UserTableProps) {
   const [globalFilter, setGlobalFilter] = useState("");
