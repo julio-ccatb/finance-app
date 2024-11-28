@@ -113,7 +113,12 @@ export function CreateLoanModal({
                 <FormItem>
                   <FormLabel className="text-sm font-medium">Monto</FormLabel>
                   <FormControl>
-                    <Input placeholder="0.00" {...field} className="w-full" />
+                    <Input
+                      inputMode="decimal"
+                      placeholder="0.00"
+                      {...field}
+                      className="w-full"
+                    />
                   </FormControl>
                   <FormDescription className="text-xs sm:text-sm">
                     Ingrese el monto del préstamo en pesos.
@@ -227,6 +232,7 @@ export function CreateLoanModal({
                   <FormControl>
                     <Input
                       placeholder="0.00"
+                      inputMode="decimal"
                       {...field}
                       value={field.value ?? undefined}
                       className="w-full"

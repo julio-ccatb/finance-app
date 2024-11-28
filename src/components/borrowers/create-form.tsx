@@ -143,7 +143,6 @@ export function CreateBorrowerForm({
                         form.setValue("phone", value, { shouldValidate: true })
                       }
                     />
-                    {/* <Input type="tel" {...field} /> */}
                   </FormControl>
                   <FormMessage />
                 </FormItem>
