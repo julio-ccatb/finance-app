@@ -1,5 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import {
   borrowers,
   BorrowersInsertSchema,
@@ -13,6 +13,8 @@ export const borrowerRouter = createTRPCRouter({
   create: protectedProcedure
     .input(BorrowersInsertSchema)
     .mutation(async ({ ctx, input }) => {
+      const user = ctx.session.user;
+      input.createdBy = user.id;
       console.log(input);
       await ctx.db.insert(borrowers).values(input);
     }),
@@ -21,30 +23,38 @@ export const borrowerRouter = createTRPCRouter({
     .query(async ({ ctx }) => {
       const user = ctx.session.user;
       console.log(user.id);
-      const queryResult = await ctx.db
 
+      // Step 1: Fetch all borrowers created by the user
+      const borrowersQueryResult = await ctx.db
         .select()
         .from(borrowers)
-        .leftJoin(loans, eq(borrowers.id, loans.borrowerId))
-        .where(eq(loans.ownerId, user.id));
+        .where(eq(borrowers.createdBy, user.id));
 
-      // Group loans by borrower ID
-      const groupedByBorrower = groupBy(
-        queryResult,
-        (item) => item.borrowers.id,
+      // Extract borrower IDs
+      const borrowerIds = borrowersQueryResult.map((borrower) => borrower.id);
+
+      // Step 2: Fetch loans for the retrieved borrowers
+      const loansQueryResult = await ctx.db
+        .select()
+        .from(loans)
+        .where(inArray(loans.borrowerId, borrowerIds));
+
+      // Step 3: Group loans by borrower ID
+      const loansGroupedByBorrowerId = groupBy(
+        loansQueryResult,
+        (loan) => loan.borrowerId,
       );
 
-      // Transform the grouped data
-      const result = Object.values(groupedByBorrower).map((group) => {
-        const borrower = group[0]?.borrowers; // The borrower details
-        const loans = group
-          .filter((item) => item.loans) // Filter out rows with no loans
-          .map((item) => item.loans); // Extract loan details
+      // Step 4: Format the result
+      const result = borrowersQueryResult.map((borrower) => {
+        const loans = loansGroupedByBorrowerId[borrower.id] ?? []; // Default to empty array if no loans
         return {
           ...borrower,
           loans,
         } as BorrowersSelectInput & { loans: LoansSelectInput[] };
       });
+
+      console.log(result.length);
 
       return result;
     }),

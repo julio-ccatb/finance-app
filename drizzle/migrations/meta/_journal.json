@@ -15,6 +15,13 @@
       "when": 1732709839192,
       "tag": "0001_demonic_wiccan",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1732916280652,
+      "tag": "0002_premium_agent_brand",
+      "breakpoints": true
     }
   ]
 }
