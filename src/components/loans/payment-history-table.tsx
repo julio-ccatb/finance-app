@@ -137,7 +137,9 @@ export function PaymentHistoryTable({
       accessorKey: "amount",
       header: "Monto",
       cell: ({ row }) => (
-        <span>{formatCurrency(parseFloat(row.original.amount))}</span>
+        <span className="text-nowrap font-mono">
+          {formatCurrency(parseFloat(row.original.amount))}
+        </span>
       ),
     },
     {

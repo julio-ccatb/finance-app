@@ -136,13 +136,13 @@ const Page = () => {
                     {summaryCards.map(({ title, value, icon: Icon, raw }) => (
                       <div
                         key={title}
-                        className="flex items-center justify-between"
+                        className="flex justify-between sm:flex-col"
                       >
                         <div className="flex items-center space-x-2">
                           <Icon className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm font-medium">{title}: </span>
                         </div>
-                        <span className="font-mono">
+                        <span className="font-mono text-muted-foreground">
                           {raw ? value : formatCurrency(value as number)}
                         </span>
                       </div>
