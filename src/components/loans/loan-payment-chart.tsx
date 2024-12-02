@@ -25,12 +25,14 @@ interface LoanPaymentChartProps {
   loanAmount: string;
   balancePaid: string;
   winnings: string;
+  size?: "small" | "medium" | "large";
 }
 
 export function LoanPaymentChart({
   loanAmount,
   balancePaid,
   winnings,
+  size = "medium",
 }: LoanPaymentChartProps) {
   const remainingBalance = parseFloat(
     new Decimal(loanAmount).minus(balancePaid).toString(),
@@ -118,35 +120,39 @@ export function LoanPaymentChart({
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex flex-col gap-4 pt-4">
-        <div className="grid w-full grid-cols-3 gap-4 text-center">
-          {[
-            {
-              label: "Pagado",
-              percentage: paidPercentage,
-              amount: balancePaid,
-            },
-            {
-              label: "Ganancias",
-              percentage: winningsPorcentage,
-              amount: winnings,
-            },
-            {
-              label: "Restante",
-              percentage: remainingPercentage,
-              amount: remainingBalance,
-            },
-          ].map(({ label, percentage, amount }) => (
-            <div key={label} className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">
-                {label}
-              </p>
-              <p className="text-lg font-semibold">{percentage.toFixed(2)}%</p>
-              <p className="text-sm text-muted-foreground">
-                ${amount.toLocaleString()}
-              </p>
-            </div>
-          ))}
-        </div>
+        {size !== "small" && (
+          <div className="grid w-full grid-cols-3 gap-4 text-center">
+            {[
+              {
+                label: "Pagado",
+                percentage: paidPercentage,
+                amount: balancePaid,
+              },
+              {
+                label: "Ganancias",
+                percentage: winningsPorcentage,
+                amount: winnings,
+              },
+              {
+                label: "Restante",
+                percentage: remainingPercentage,
+                amount: remainingBalance,
+              },
+            ].map(({ label, percentage, amount }) => (
+              <div key={label} className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">
+                  {label}
+                </p>
+                <p className="font-mono text-lg font-semibold">
+                  {percentage.toFixed(2)}%
+                </p>
+                <p className="font-mono text-sm text-muted-foreground">
+                  ${amount.toLocaleString()}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
         <div className="flex items-center justify-center gap-2 text-sm font-medium">
           <TrendingUp className="h-4 w-4" />
           <span>Progreso del pago del préstamo</span>

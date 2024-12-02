@@ -10,9 +10,17 @@ import { formatCurrency } from "@/lib/currency";
 import { api } from "@/trpc/react";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { CreditCard, DollarSign, PiggyBank, TrendingUp } from "lucide-react";
+import {
+  Calculator,
+  CreditCard,
+  DollarSign,
+  Eye,
+  PiggyBank,
+  TrendingUp,
+} from "lucide-react";
 import Loading from "./loading";
 import { LoanPaymentChart } from "@/components/loans/loan-payment-chart";
+import { Button } from "@/components/ui/button";
 
 const Page = () => {
   const [selectedBorrowerId, setSelectedBorrowerId] = useState<string | null>(
@@ -70,6 +78,18 @@ const Page = () => {
   const porcentajeGanancia =
     totalPrestado > 0 ? (totalGanancias / totalPrestado) * 100 : 0;
 
+  const summaryCards = [
+    { title: "Total Prestado", value: totalPrestado, icon: CreditCard },
+    { title: "Total Pendiente", value: totalPendiente, icon: DollarSign },
+    { title: "Ganancias", value: totalGanancias, icon: PiggyBank },
+    {
+      title: "Porcentaje de Ganancia",
+      value: `${porcentajeGanancia.toFixed(2)} %`,
+      icon: TrendingUp,
+      raw: true,
+    },
+  ];
+
   const handleViewLoans = (borrowerId: string) => {
     setSelectedBorrowerId(borrowerId);
     setIsLoansModalOpen(true);
@@ -97,64 +117,60 @@ const Page = () => {
       </PageHeader>
 
       <main className="space-y-6">
-        <motion.div
-          className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Prestado
-              </CardTitle>
-              <CreditCard className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {formatCurrency(totalPrestado)}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Pendiente
-              </CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {formatCurrency(totalPendiente)}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Ganancias</CardTitle>
-              <PiggyBank className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {formatCurrency(totalGanancias)}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Porcentaje de Ganancia
-              </CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {porcentajeGanancia.toFixed(2)}%
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <div className="space-y-4 lg:col-span-1">
+            <motion.div
+              className="space-y-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card className="overflow-hidden">
+                <CardHeader>
+                  <CardTitle className="text-lg font-bold">
+                    Resumen Financiero
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {summaryCards.map(({ title, value, icon: Icon, raw }) => (
+                      <div
+                        key={title}
+                        className="flex items-center justify-between"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <Icon className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm font-medium">{title}: </span>
+                        </div>
+                        <span className="font-mono">
+                          {raw ? value : formatCurrency(value as number)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+            <div className="flex flex-col space-y-2">
+              <Button className="w-full justify-start" variant="outline">
+                <Calculator className="mr-2 h-4 w-4" />
+                Generar Interés Mensuales
+              </Button>
+              <Button className="w-full justify-start" variant="outline">
+                <Eye className="mr-2 h-4 w-4" />
+                Ver Pagos Pendientes
+              </Button>
+            </div>
+          </div>
+          <div className="rounded-lg lg:col-span-2">
+            <LoanPaymentChart
+              size="small"
+              winnings={totalGanancias.toString()}
+              loanAmount={totalPrestado.toString()}
+              balancePaid={totalDevuelto.toString()}
+            />
+          </div>
+        </div>
 
         <Card>
           <CardHeader>
@@ -169,13 +185,6 @@ const Page = () => {
             />
           </CardContent>
         </Card>
-        <div className="w-1/3">
-          <LoanPaymentChart
-            winnings={totalGanancias.toString()}
-            loanAmount={totalPrestado.toString()}
-            balancePaid={totalDevuelto.toString()}
-          />
-        </div>
 
         {selectedBorrowerId && borrowers && (
           <>
